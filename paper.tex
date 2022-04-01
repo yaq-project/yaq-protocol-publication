@@ -10,20 +10,61 @@
 
 \maketitle
 
+\section{Abstract}
+
 \section{Introduction}
 
-Many existing projects.
-Lack of reusability and portability.
+Instrumentation development is a key part of the scientific enterprise.
+Scientists have always relied on their creativity and wit to assemble new instruments capable of carrying out new experimental procedures.
+As the scientific industry has advanced, scientists are increasingly able to directly purchase pieces of their instruments.
+A modern instrument might contain a motor from company A, a sensor from company B, a specialty light source from company C, and a totally custom robotic sample stage.
+The brand new scientific instrument, doing a brand new experiment, is cobbled together from a few dozen pieces of hardware, some brand new and some reused.
+The instrumental novelty arises from the creative way that all of those pieces are assembled and controlled in the context of the experiment.
+
+Software integration can be a frustrating piece of the modern instrument development process.
+Each individual component has its own drivers and interface.
+A lack of standards means that each scientist must develop her own instrument control application.
+Weeks can be spent just integrating one new component into an existing project.
+Code reusability is typically poor, and technical debt grows quickly in academic and educational contexts.
+Sientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
+
+Briefly, we
+Minimum viable capabilities for desired protocol.
+Focus on making client development easy.
+\begin{itemize}
+  \item Networked machines (subitem--multilingual)
+  \item Unified interface (traits)
+  \item Self describing
+  \item Built on exisiting protocols
+  \item Reusable
+  \item Synchronous clients
+  \item Portable, easy to install
+  \item Interface agnostic. Not just serial. Certainly not just SCPI.
+\end{itemize}
+Well defined, concrete interface.
+Static interface.
+
+There are several large exisiting open source hardware interface projects [cite EPICS, TANGOS, pymodaq, other].
+These projects are impressive at facility scale, but in our experience these do not scale well to single-investigator lab environments.
+We have aimed to keep yaq as simple as possible, with the goal of staying easy to manage at very small scales without dedicated staff.
+Certainly yaq lacks features compared to these exisiting projects, as we will highlight.
+
+There are exisiting open source hardware interface projects with a focus on simplicity [cite INSTRBUILDER etc].
+To our knowledge none of these meet the minimal capabilities as outlined above.
+
+Overview of this publication.
+yaq is a protocol.
+yaq is an implementation that runs as a stand-alone daemon.
+yaq has a variety of clients.
+yaq is not opinonated about orchestration layer.
 
 \section{Protocol}
 
 TCP
 
-JSON-RPC
+AVRO-RPC
 
 configuration
-
-recommend implementing as daemon (service)
 
 \section{Daemons}
 
@@ -34,6 +75,38 @@ Discussion of traits and purpose of compositional approach.
 \section{Clients}
 
 A few ``short stories'' of particular instruments utilizing yaq.
+
+Fakeable.
+
+\subsubsection{yaqc}
+
+Lightweight scriptable.
+
+\subsubsection{yaqc-qtpy}
+
+Capitalizes heavily on traits
+
+\subsubsection{Stahl}
+
+Self contained ecosystem on a raspberry pi.
+
+Dedicated client application.
+
+Exceedingly simple.
+
+(reference publication)
+
+\subsubsection{Landis}
+
+....
+
+\subsubsection{Goldsmith}
+
+Mixing with other hand built or commercially derived software.
+
+\subsubsection{Bluesky}
+
+Bridging to larger open source control layers.
 
 \section{Conclusions}
 
