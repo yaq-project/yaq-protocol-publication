@@ -60,17 +60,24 @@ yaq is not opinonated about orchestration layer.
 
 \section{Protocol}
 
-TCP
+yaq is built on top of Apache Avro RPC \cite{AvroSpecification}.
+Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon \(the server\) which has direct hardware access.
+Avro provides an agreed upon standard for serialization of data and method calls from a remote \(client\) process.
+The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional messages that can be processed by the daemon.
+Each daemon provides an Avro Protocol file \(avpr\) which provides a complete list of the types and allowed messages.
 
-\subsection{TCP}
-
-\subsection{Avro RPC}
-
-AVRO-RPC
+While Avro RPC itself is agnostic to transport layer, yaq specifies TCP sockets as the transport layer.
+TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be implemented in a variety of languages if required.
+The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
+yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
 
 \subsection{Configuration and State}
 
-configuration
+In addition to the standard, yaq specifices schema for configuration options and for state that is persistent across restarts of a daemon.
+
+\subsection{Properties and Traits}
+
+
 
 \section{Daemons}
 
