@@ -88,34 +88,43 @@ Fakeable.
 
 \section{Clients}
 
-A few ``short stories'' of particular instruments utilizing yaq.
+yaq's RPC design invites the creation of multiple client libraries specialized for specific purposes.
+Again, daemons can communicate simultaniously with multiple clients.
+For a yaq instrument it is normal to have multiple clients running simultaniously, each focused on a particular purpose.
+This modularity speeds development and increases overall flexibility of the system.
+We have created a few client libraries which we will discuss here.
 
-\subsection{yaqc}
+yaqc [CITE] is a very basic Python client for yaq.
+yaqc is totally generic and aims to support any conceivable yaq RPC.
+This library is easy to use directly in Python scripts or within the REPL, but it's also very useful as a dependency when building more specialized Python clients.
 
-Lightweight scriptable.
+yaqc-qtpy [CITE] is a specialty Qt-based [CITE] GUI client.
+yaqc-qtpy provides a special QClient object which uses Qt threading primatives to provide performant and safe access to yaq from a Qt environment.
+In addition, yaqc-qtpy provides an entry point which automatically builds a GUI from arbitrary protocols using traits.
+This is an invaluable tool which provides a ``free'' graphical user interface to any daemon.
 
-\subsection{yaqc-qtpy}
+Bluesky is an extensive open source control layer developed collaboratively across several user facilities \cite{AllanDanielB2019a}.
 
-Capitalizes heavily on traits
-
-\subsection{Bluesky}
-
-Bluesky is an extensive open source control layer \cite{AllanDanielB2019a}.
 Bridging to larger open source control layers.
+PyMoDaq \cite{WeberSebastien2021a}
 
 \section{Case Studies}
 
-\subsection{Stahl}
+Introductory paragraph.
 
-Self contained ecosystem on a raspberry pi.
+The Landis Group at UW-Madison created WiQK, a quench kinetics reactor.
+Reactions can be orchestrated with a simple script using Python's built-in time library and yaqc.
+This has worked for a few years as developers continue to modify their reactor.
 
-Dedicated client application.
+The Stahl Group at UW-Madison created a custom reactor which monitors gasses being produced or consumed in the reaction head-space.  \cite{SalazarChaseA2021a}
+From an automation control perspective, this reactor incorporates a collection of sensors and a single heating process value under computer control
+This reactor was made as a self-contained unit with a Raspberry Pi [CITE] as the computer.
+Users interact with a custom Qt-based GUI to use the reactor.
+yaq daemons run locally along-side the lightweight Qt application making the entire system simple to run.
 
-Exceedingly simple.
-
-(reference publication)
-
-\subsection{Wright}
+The Wright Group needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments.
+We have built out a toolchain incorporating yaq into Bluesky to take advantage of the sophisticated orchestration that Bluesky supports.
+We are excited about Bluesky moving forward.
 
 \section{Conclusions}
 
