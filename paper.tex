@@ -58,6 +58,27 @@ yaq is an implementation that runs as a stand-alone daemon.
 yaq has a variety of clients.
 yaq is not opinonated about orchestration layer.
 
+\section{Daemons}
+
+In yaq, each component of an instrument is supported by a tiny lightweight process that runs in the background of your computer: a daemon.
+Since each component has its own process, each daemon can be developed separately.
+Using yaq, a typical instrument might have several daemons each supporting a particular component.
+Daemon A might support a motor, daemon B a sensor, and daemon C a light source.
+To do an experiment, a control program (a "client") must send commands to each of these daemons.
+Each of the daemons is a separate application running in its own process, and importantly the client is also a separate application.
+
+The separation between each daemon and client makes the yaq framework less fragile than monolithic applications.
+The yaq framework is language agnostic.
+For example, a daemon written in Python might be controlled by a client implemented using LabVIEW.
+In yaq, each component of an instrument can be developed and distributed separately.
+For example, two very different instruments might happen to use the same temperature sensor.
+Because the temperature sensor daemon is its own independent program, both instruments can benefit from the same daemon.
+As yaq grows, the "ecosystem" of existing daemons means that future instruments become easier and easier to develop.
+
+There are currently 62 daemons in the yaq project supporting at least 40 kinds of hardware.
+Because yaq is protocol based, anyone can design and publish new daemons extending our hardware support.
+A living list of all daemons and supported hardware can be found on the yaq website.
+
 \section{Protocol}
 
 yaq is built on top of Apache Avro RPC \cite{AvroSpecification}.
@@ -71,27 +92,26 @@ TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be imp
 The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
 yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
 
-\subsection{Configuration and State}
-
 In addition to the standard, yaq specifices schema for configuration options and for state that is persistent across restarts of a daemon.
 
-\subsection{Properties and Traits}
+Properties and traits in general.
 
+\section{Traits}
 
+Each component of a scientific instrument may have many parameters.
+Similar components typically have similar parameters, but there may be incidental differences between each implementation.
+For example, consider two different monochromators.
+The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set angle".
+Any experimentalist wishing to switch from monochromator A to B must first go through their entire codebase to fix all of the small differences in the driver implementation.
+yaq is designed using an (optional) compositional system that helps enforce consistency between different kinds of hardware.
 
-\section{Daemons}
-
-Daemon roundup.
-
-Discussion of traits and purpose of compositional approach.
-
-\subsection{Traits}
-
-Graphic of traits?
-
-Examples of daemons for core traits.
-
-Fakeable.
+yaq defines "traits": collections of behaviors which are logically grouped together.
+Each trait specifies a set of configuration options, state entries, and methods that a daemon can implement.
+Daemons, then, can be composed of multiple traits.
+Clients can trust that daemons which implement a given trait will behave in similar ways.
+For example, any daemon that implements the "is-position" trait must expose the methods "get\_position" and "set\_position".
+It becomes easy to write generic clients that work with any daemon that has certain traits.
+Of course, daemons are always allowed to implement additional configuration, state, and methods in addition to those which are implied by their traits.
 
 \section{Clients}
 
@@ -117,21 +137,32 @@ PyMoDaq \cite{WeberSebastien2021a}
 
 \section{Case Studies}
 
-Introductory paragraph.
+yaq's simplicity and extensible nature has allowed us to use it in a broad variety of instrumentation designs.
+We highlight a few such designs here.
 
-The Landis Group at UW-Madison created WiQK, a quench kinetics reactor.
-Reactions can be orchestrated with a simple script using Python's built-in time library and yaqc.
-This has worked for a few years as developers continue to modify their reactor.
+The Landis Group at UW-Madison is currently working on a new type of flow reactor: the Wisconsin Quench Kinetics Reactor (WiQK).
+This reactor incorporates several computer-controlled valves and syringe pumps as well as various sensors.
+The WiQK is rapidly evolving as researchers continue to test and refine their design.
+Only a few researchers are actively using the reactor during this prototyping stage.
+The Landis Group has written very basic Python scripts utilizing yaqc to orchestrate hardware for their reactor.
+These lightweight scripts can be extensively refactored as the hardware and orchestration strategy changes dramatically during WiQK development.
+This approach ensures that the Landis Group is not limited by their ability to orchestrate hardware as they refine their reactor design.
 
 The Stahl Group at UW-Madison created a custom reactor which monitors gasses being produced or consumed in the reaction head-space.  \cite{SalazarChaseA2021a}
-From an automation control perspective, this reactor incorporates a collection of sensors and a single heating process value under computer control
-This reactor was made as a self-contained unit with a Raspberry Pi [CITE] as the computer.
-Users interact with a custom Qt-based GUI to use the reactor.
-yaq daemons run locally along-side the lightweight Qt application making the entire system simple to run.
+This reactor incorporates a collection of sensitive pressure transducers and a single heating process value under computer control.
+yaq daemons are used to interface with each sensor and the heater controller.
+We were able to create a lightweight Qt-based GUI which offers an easy user experience to researchers.
+By separating hardware interface code from GUI code, each piece of the system became easier to produce and maintain.
+Taken together, these components have been a solid software experience for many users over several years.
 
-The Wright Group needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments.
-We have built out a toolchain incorporating yaq into Bluesky to take advantage of the sophisticated orchestration that Bluesky supports.
-We are excited about Bluesky moving forward.
+The Wright Group at UW-Madison needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments \cite{MukamelShaul2000a, WrightJohnCurtis2011a}.
+This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
+Now, using yaq, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
+Moving forward, the Wright Group hopes to spend less energy developing control software and more energy developing creative spectroscopy experiments.
+
+yaq is also being used in several smaller ways throughout UW-Madison Chemistry.
+Excitingly, all of these research groups are able easily benefit from each-other's daemon developments.
+This level of collaboration is new to us in the orchestration software space.
 
 \section{Conclusions}
 
