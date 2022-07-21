@@ -15,48 +15,70 @@
 \section{Introduction}
 
 Instrumentation development is a key part of the scientific enterprise.
-Scientists have always relied on their creativity and wit to assemble new instruments capable of carrying out new experimental procedures.
-As the scientific industry has advanced, scientists are increasingly able to directly purchase pieces of their instruments.
-A modern instrument might contain a motor from company A, a sensor from company B, a specialty light source from company C, and a totally custom robotic sample stage.
-The brand new scientific instrument, doing a brand new experiment, is cobbled together from a few dozen pieces of hardware, some brand new and some reused.
-The instrumental novelty arises from the creative way that all of those pieces are assembled and controlled in the context of the experiment.
-
-Software integration can be a frustrating piece of the modern instrument development process.
-Each individual component has its own drivers and interface.
-A lack of standards means that each scientist must develop her own instrument control application.
+As the scientific industry has advanced, novel instruments are typically constructed of many individual components, purchased and home-built. %scientists are increasingly able to directly purchase pieces of their instruments.
+Orchestration software must communicate with each hardware component in the course of a scientific experiment.
+This can involve utilization of many protocols: NI DAQmx [CITE], SCPI [CITE], ModBus [CITE], PICam [CITE], Thorlabs APT [CITE], among many others.
+The challenge of integrating all of these is a frustrating piece of the modern instrument development process.
 Weeks can be spent just integrating one new component into an existing project.
 Code reusability is typically poor, and technical debt grows quickly in academic and educational contexts.
-Sientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
+Scientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
 
-Briefly, we
-Minimum viable capabilities for desired protocol.
-Focus on making client development easy.
-\begin{itemize}
-  \item Networked machines (subitem--multilingual)
-  \item Unified interface (traits)
-  \item Self describing
-  \item Built on exisiting protocols
-  \item Reusable
-  \item Synchronous clients
-  \item Portable, easy to install
-  \item Interface agnostic. Not just serial. Certainly not just SCPI.
-\end{itemize}
-Well defined, concrete interface.
-Static interface.
-
-There are several large exisiting open source hardware interface projects, such as EPICS \cite{DalesioLR1991a}, TANGO \cite{tango-controls.org}, and pymodaq \cite{WeberSebastien2021a}.
+Some large user-facilities have addressed protocol complexity via the creation of new unified protcols, EPICS \cite{DalesioLR1991a}, TANGO \cite{tango-controls.org}
+The unified protocols define a standard network interface for any hardware component.
+Orchestration software can target this unified protocol for reading and writing hardware state.
+Small background services are written to translate the myriad component protocols into the standard EPICS IOCs and TANGO Devices.
+These programs are peformant, but require expert management to set up and provide descriptions via a separate server program.
 These projects are impressive at facility scale, but in our experience these do not scale well to single-investigator lab environments.
-We have aimed to keep yaq as simple as possible, with the goal of staying easy to manage at very small scales without dedicated staff.
-Certainly yaq lacks features compared to these exisiting projects, as we will highlight.
 
-There are exisiting open source hardware interface projects with a focus on simplicity [cite INSTRBUILDER etc].
-To our knowledge none of these meet the minimal capabilities as outlined above.
+As smaller research labs have grown in experimental complexity, many hardware abstraction layers have been produced by individual labs.
+Most small custom research instrumentation continues to rely on monolithic home-built orchestration software which has hardcorded protocol support for each particular connected device.
+These monolithic applications tend to be very inflexible and difficult to develop.
+In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity [cite many].
+While this growth is encouraging, many of these are limited by their focus on particular types of hardware or particular experimental domains.
+To our knowledge, none of these projects take a strict protocol-based approach.
+ 
+We have created a new protocol [XKCD] for scientific instrumentation, yaq.
+This protocol attempts to borrow the most important ideas from established projects while retaining simplicity appropriate for small research labs.
+We have built this protocol to be self-describing, portable, and reusable wherever possible.
+Our primary goal has been to make an interface which simplifies orchestration software development as much as possible.
+Here we discuss the design of the yaq ecosystem.
+Several case studies provide a view in to the flexible ways that yaq can be applied to perform very different scientific experiments.
 
-Overview of this publication.
-yaq is a protocol.
-yaq is an implementation that runs as a stand-alone daemon.
-yaq has a variety of clients.
-yaq is not opinonated about orchestration layer.
+\section{Protocol}
+
+The yaq protcol is client-server network based.
+To communicate with a given piece of hardware, a client connects to a particular TCP port either locally or to a remote machine over the network.
+Once connected, the client will recieve an exhaustive description of what capabilities that particular hardware interface supports.
+Clients can connect to many TCP ports and each TCP port can simultaniopusly communicate with many clients.
+While Avro RPC itself is agnostic to transport layer, yaq specifies TCP sockets as the transport layer.
+TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be implemented in a variety of languages if required.
+The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
+
+Apache Avro RPC \cite{AvroSpecification} is used to structure the yaq protcol.
+Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon \(the server\) which has direct hardware access.
+Avro provides an agreed upon standard for efficient serialization of data and method calls from a remote \(client\) process.
+The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional messages that can be processed by the daemon.
+Each daemon provides an Avro Protocol file \(avpr\) which provides a complete list of the types and allowed messages.
+yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
+
+In practice, each hardware interface is exposed to all clients as a set of well-described function calls.
+
+\section{Traits}
+
+Each component of a scientific instrument may have many parameters.
+Similar components typically have similar parameters, but there may be incidental differences between each implementation.
+For example, consider two different monochromators.
+The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set angle".
+Any experimentalist wishing to switch from monochromator A to B must first go through their entire codebase to fix all of the small differences in the driver implementation.
+yaq is designed using an (optional) compositional system that helps enforce consistency between different kinds of hardware.
+
+yaq defines "traits": collections of behaviors which are logically grouped together.
+Each trait specifies a set of configuration options, state entries, and methods that a daemon can implement.
+Daemons, then, can be composed of multiple traits.
+Clients can trust that daemons which implement a given trait will behave in similar ways.
+For example, any daemon that implements the "is-position" trait must expose the methods "get\_position" and "set\_position".
+It becomes easy to write generic clients that work with any daemon that has certain traits.
+Of course, daemons are always allowed to implement additional configuration, state, and methods in addition to those which are implied by their traits.
 
 \section{Daemons}
 
@@ -79,39 +101,7 @@ There are currently 62 daemons in the yaq project supporting at least 40 kinds o
 Because yaq is protocol based, anyone can design and publish new daemons extending our hardware support.
 A living list of all daemons and supported hardware can be found on the yaq website.
 
-\section{Protocol}
 
-yaq is built on top of Apache Avro RPC \cite{AvroSpecification}.
-Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon \(the server\) which has direct hardware access.
-Avro provides an agreed upon standard for serialization of data and method calls from a remote \(client\) process.
-The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional messages that can be processed by the daemon.
-Each daemon provides an Avro Protocol file \(avpr\) which provides a complete list of the types and allowed messages.
-
-While Avro RPC itself is agnostic to transport layer, yaq specifies TCP sockets as the transport layer.
-TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be implemented in a variety of languages if required.
-The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
-yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
-
-In addition to the standard, yaq specifices schema for configuration options and for state that is persistent across restarts of a daemon.
-
-Properties and traits in general.
-
-\section{Traits}
-
-Each component of a scientific instrument may have many parameters.
-Similar components typically have similar parameters, but there may be incidental differences between each implementation.
-For example, consider two different monochromators.
-The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set angle".
-Any experimentalist wishing to switch from monochromator A to B must first go through their entire codebase to fix all of the small differences in the driver implementation.
-yaq is designed using an (optional) compositional system that helps enforce consistency between different kinds of hardware.
-
-yaq defines "traits": collections of behaviors which are logically grouped together.
-Each trait specifies a set of configuration options, state entries, and methods that a daemon can implement.
-Daemons, then, can be composed of multiple traits.
-Clients can trust that daemons which implement a given trait will behave in similar ways.
-For example, any daemon that implements the "is-position" trait must expose the methods "get\_position" and "set\_position".
-It becomes easy to write generic clients that work with any daemon that has certain traits.
-Of course, daemons are always allowed to implement additional configuration, state, and methods in addition to those which are implied by their traits.
 
 \section{Clients}
 
