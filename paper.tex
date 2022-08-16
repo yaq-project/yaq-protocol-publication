@@ -56,7 +56,7 @@ Weeks can be spent just integrating one new component into an existing project.
 Code reusability is typically poor, and technical debt grows quickly in academic and educational contexts.
 Scientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
 
-Some large user-facilities have addressed protocol complexity via the creation of new unified protcols, EPICS \cite{DalesioLR1991a}, TANGO \cite{tango-controls.org}
+Some large user-facilities have addressed protocol complexity via the adoption unified protcols, such as EPICS \cite{DalesioLR1991a} or TANGO \cite{AGotz1999TANGOA}.
 The unified protocols define a standard network interface for any hardware component.
 Orchestration software can target this unified protocol for reading and writing hardware state.
 Small background services are written to translate the myriad component protocols into the standard EPICS IOCs and TANGO Devices.
@@ -81,9 +81,6 @@ Several case studies provide a view in to the flexible ways that yaq can be appl
 
 \subsection{Architecture}
 
-This section has to introduce the ideas of clients, daemons, and network traffic.
-Should get the multilingual idea here.
-
 Like EPICS and TANGO, the yaq protcol is client-server network based.
 To communicate with a given piece of hardware, a client connects to a particular TCP port either locally or to a remote machine over the network.
 Clients can connect to many TCP ports and each TCP port can simultaneously communicate with many clients.
@@ -92,52 +89,54 @@ Since each component has its own process, each daemon can be developed separatel
 Daemon A might support a motor, daemon B a sensor, and daemon C a light source.
 To do an experiment, a control program (a "client") must send commands to each of these daemons.
 Each of the daemons is a separate application running in its own process, and importantly the client is also a separate application.
+Since the traffic over the network is standardized, yaq daemons and clients can be written in any programming language.
+The reference implementation is provided in Python [CITE].
 
 \subsection{Avro}
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{./figures/methods.png}
-  \caption{  \label{fig:methods} A figure caption. The figure captions are automatically numbered.}
+  \caption{  \label{fig:methods} A description of standard yaq methods, providing their parameters and return value}
 \end{figure}
 
 Once connected, the client will receive an exhaustive description of what capabilities that particular hardware interface supports.
 Among this description is a machine-readable summary of what the signature of each remote procedure is.
-Figure \ref{fig:methods} summarizes what this might look like.
+Figure \ref{fig:methods} summarizes the information provided about methods exposed by yaq daemons.
 Here we see three remote procedures, each with a described set of arguments ``request'' and a described response.
 As the figure shows, these signatures are typed.
 This is only a small piece of the information a client receives.
+
+Apache Avro RPC \cite{AvroSpecification} is used to structure the yaq protcol.
+Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon (the server) which has direct hardware access.
+Avro provides an agreed upon standard for efficient serialization of data and method calls from a remote (client) process.
+The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional methods that can be processed by the daemon.
+Upon connecting to a client, each daemon provides an Avro Protocol file (avpr) which provides a complete list of the types and allowed methods in a process known as a "handshake".
+yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
 
 While Avro RPC itself is agnostic to transport layer, yaq specifies TCP sockets as the transport layer.
 TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be implemented in a variety of languages if required.
 The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
 
-Apache Avro RPC \cite{AvroSpecification} is used to structure the yaq protcol.
-Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon \(the server\) which has direct hardware access.
-Avro provides an agreed upon standard for efficient serialization of data and method calls from a remote \(client\) process.
-The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional messages that can be processed by the daemon.
-Each daemon provides an Avro Protocol file \(avpr\) which provides a complete list of the types and allowed messages.
-yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
-
 \subsection{Traits}
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{./figures/traits.png}
-  \caption{  \label{fig:traits} A figure caption. The figure captions are automatically numbered.}
+  \caption{  \label{fig:traits} Traits provide collections of RPC methods that are implemented for multiple kinds of hardware.}
 \end{figure}
 
 Each component of a scientific instrument may have many parameters.
 Similar components typically have similar parameters, but there may be incidental differences between each implementation.
 For example, consider two different monochromators.
-The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set angle".
+The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set color".
 Any experimentalist wishing to switch from monochromator A to B must first go through their entire codebase to fix all of the small differences in the driver implementation.
 yaq is designed using an (optional) compositional system that helps enforce consistency between different kinds of hardware.
 We call this system ``traits''.
 
 The most basic feature of each trait is a collection of well-defined method signatures, as illustrated by Figure \ref{fig:traits}.
 Here, ``has-position'' is a trait and ``set\_position'' and ``get\_position'' are two method signatures defined by that trait.
-For brevity we only show method names here, but in reality each method signature is fully described as discussed in the previous section.
-Any protocol that wants to implement the ``has-position'' trait must then support those two method signatures.
-Importantly, protocols can also implement arbitrary additional methods that are not defined by any trait.
+For brevity we only show method names here, but in reality each method signature is fully described as in Figure \ref{fig:methods}.
+Any daemon that wants to implement the ``has-position'' trait must then support those two method signatures.
+Importantly, specific daemons can also implement arbitrary additional methods that are not defined by any trait.
 
 The trait system was introduced in pursuit of our primary goal of easing the client development process.
 Clients can trust that protocols that implement a given trait will behave in similar ways.
@@ -150,14 +149,18 @@ These enhancement proposals can be found on the yaq website.
 \begin{figure}
   \label{fig:daemons}
   \includegraphics[width=\columnwidth]{./figures/daemons.png}
-  \caption{ A figure caption. The figure captions are automatically numbered.}
+  \caption{A collection of yaq daemons, highlighting the traits which each daemon implements.}
 \end{figure}
 
 In yaq, each component of an instrument is supported by a tiny lightweight process that runs in the background of your computer: a daemon.
 Using yaq, a typical instrument has several daemons each supporting a particular component.
 As illustrated in Figure \ref{fig:daemons}, each of these daemons has a single protocol which is typically composed of multiple traits as well as unique methods.
 
-Paragraph to describe that methods return quickly and existence of busy.
+The yaq ecosystem is optimized for ease of writing client applications.
+As such, it is expected that each method call over the yaq interface will return rapidly, ensuring that client applications are not blocked for extended periods of time.
+This principle applies even when the method starts an action that might take several seconds to complete, such as homing a motor or initiating a measurement for a sensor.
+In these instances, the initial method simply starts the action and returns, with a separate method provided to retrieve results if they exist.
+In order to know how long to wait, the ``is-daemon`` trait provides a method called ``is\_busy'' which should return "true" while the long running action is not complete, and "false" once it is finished.
 
 In yaq, each component of an instrument can be developed and distributed separately.
 For example, two very different instruments might happen to use the same temperature sensor.
@@ -173,12 +176,11 @@ A living list of all daemons and supported hardware can be found on the yaq webs
 \begin{figure}
   \label{fig:acquisition}
   \includegraphics[width=\columnwidth]{./figures/acquisition.png}
-  \caption{ A figure caption. The figure captions are automatically numbered.}
+	\caption{Pseudocode of a simple acquisition with one motor and two sensors as described in Figure \ref{fig:daemons}.}
 \end{figure}
 
 yaq's RPC design invites the creation of multiple client libraries specialized for specific purposes.
-Again, daemons can communicate simultaniously with multiple clients.
-For a yaq instrument it is normal to have multiple clients running simultaniously, each focused on a particular purpose.
+For a yaq instrument it is normal to have multiple clients running simultaneously, each focused on a particular purpose.
 This modularity speeds development and increases overall flexibility of the system.
 
 Figure \ref{fig:acquisition} illustrates using pseudocode what a very basic experimental acquisition might look like using yaq.
@@ -189,18 +191,22 @@ Because all of these methods are trait-defined, this simple acquisition loop wil
 While this example is simplified, in practice we have found writing simple scripts to drive experiments to be a very productive approach.
 
 yaqc [CITE] is a very basic Python client for yaq.
-yaqc is totally generic and aims to support any conceivable yaq RPC.
-This library is easy to use directly in Python scripts or within the REPL, but it's also very useful as a dependency when building more specialized Python clients.
+yaqc is totally generic and aims to support any conceivable yaq daemon.
+This library is easy to use directly in Python scripts or interactively, but it's also very useful as a dependency when building more specialized Python clients.
 
 yaqc-qtpy [CITE] is a specialty Qt-based [CITE] GUI client.
-yaqc-qtpy provides a special QClient object which uses Qt threading primatives to provide performant and safe access to yaq from a Qt environment.
-In addition, yaqc-qtpy provides an entry point which automatically builds a GUI from arbitrary protocols using traits.
+yaqc-qtpy provides a ``QClient'' object which uses Qt threading primatives to provide performant and safe access to yaq from a Qt environment.
+In addition, yaqc-qtpy provides a graphical application which automatically populates from arbitrary protocols using traits.
 This is an invaluable tool which provides a ``free'' graphical user interface to any daemon.
 
+Naturally, many scientists would assume that yaq is in competition with other hardware interface layers.
+We, however, do not see yaq as an "either/or" choice, and feel that the self describing nature of yaq coupled with the trait system for shared behavior make for opportunities to bridge between existing projects.
 Bluesky is an extensive open source control layer developed collaboratively across several user facilities \cite{AllanDanielB2019a}.
+yaq provides \texttt{yaqc-bluesky} [CITE] which translates yaq RPC method calls into the equivalent formatting used by Bluesky.
+This allows extraordinary access to the broad array of orchestration and data acquisition capabilities of Bluesky.
+Users of Bluesky can mix-and-match hardware interface layers, and are not required to use only yaq-based hardware.
 
-Bridging to larger open source control layers.
-PyMoDaq \cite{WeberSebastien2021a}
+Additionally, the authors of yaq and the authors of PyMoDaq \cite{WeberSebastien2021a} are in ongoing conversations about how we can best support each other's community and hardware interface options.
 
 \section{Case Studies}
 
