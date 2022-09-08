@@ -13,6 +13,8 @@
 \usepackage{mathptmx}
 \usepackage{etoolbox}
 
+\newcommand\yaq{\texttt{yaq}}
+
 \makeatletter
 \def\@email#1#2{%
  \endgroup
@@ -77,84 +79,89 @@ Our primary goal has been to make an interface which simplifies orchestration so
 Here we discuss the design of the yaq ecosystem.
 Several case studies provide a view in to the flexible ways that yaq can be applied to perform very different scientific experiments.
 
-\section{Protocol}
+\section{Accessibility to Automate}
 
-\subsection{Architecture}
+Complex instrumentation is often driven with custom orchestration software written in LabVIEW or Python.
+This software is powerful, but in our experience it often fails to capture all of the unique hardware.
+Scientists find themselves using multiple pieces of software, some developed by manufacturers and some developed in-house, to control their instrument in a piecemeal way.
+Often, there is no single location where a scientist can address all of their hardware in a fully automated fashion.
+This lack of accessibility to automate limits experimental throughput and creativity, increasing the complexity of the user experience.
 
-Like EPICS and TANGO, the yaq protcol is client-server network based.
+We describe three major barriers to implementing full automation of custom instrumentation.
+First barrier: Multiple incompatible protocols are used to communicate with each component of the system.
+A fully automated system must be able to use all of these protocols, a daunting task for scientists who do not specialize in software development\cite{}.
+Second barrier: Certain specialty hardware require particular hardware and software requirements.
+A specialty camera will only work with an ISA card and drivers for Windows XP.
+A data acquisition manufacturer provides an API that only works in Python 3.7.
+A graduate student wishes to drive some stepper motor using a Raspberry Pi.
+These examples are representative of the challenging barriers that most automation systems have no avenue to address.
+Third barrier: Some hardware interfaces are blocking.
+A LabVIEW interface freezes communication with motors while waiting for a camera to collect data.
+Custom orchestration software needs to be closed before the manufacturers configuration software can be used.
+A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
+
+\begin{figure}
+\caption{\label{fig:network} Networking diagram}
+\end{figure}
+
+\yaq{} defines a new network-based protocol which addresses these three barriers.
+Figure \ref{fig:network} ...
+
+Like EPICS and TANGO, the \yaq{} protocol is client-server network based.
 To communicate with a given piece of hardware, a client connects to a particular TCP port either locally or to a remote machine over the network.
 Clients can connect to many TCP ports and each TCP port can simultaneously communicate with many clients.
 
-Since each component has its own process, each daemon can be developed separately.
 Daemon A might support a motor, daemon B a sensor, and daemon C a light source.
 To do an experiment, a control program (a "client") must send commands to each of these daemons.
 Each of the daemons is a separate application running in its own process, and importantly the client is also a separate application.
 Since the traffic over the network is standardized, yaq daemons and clients can be written in any programming language.
 The reference implementation is provided in Python [CITE].
 
-\subsection{Avro}
+\section{Experimental Flexibility}
 
-\begin{figure}
-  \includegraphics[width=\columnwidth]{./figures/methods.png}
-  \caption{  \label{fig:methods} A description of standard yaq methods, providing their parameters and return value}
-\end{figure}
+Existing experimental orchestration software is often highly inflexible.
+A laser lab needs to spend weeks on software development when introducing a single new motor into their experimental procedure.
+A researcher needs to shut down an entire instrument when debugging the details of a particular serial interface.
+Researchers are disappointed to realize that they are forced to start from scratch when developing software for a similar instrument built with trivially different hardware.
+An experimentalist will spend many hours in lab to do trivial tasks such as repeated acquisitions because their software does not support repetition and it is too challenging to add the functionality.
 
-Once connected, the client will receive an exhaustive description of what capabilities that particular hardware interface supports.
-Among this description is a machine-readable summary of what the signature of each remote procedure is.
-Figure \ref{fig:methods} summarizes the information provided about methods exposed by yaq daemons.
-Here we see three remote procedures, each with a described set of arguments ``request'' and a described response.
-As the figure shows, these signatures are typed.
-This is only a small piece of the information a client receives.
+In our view, software inflexibility is a natural consequence of the typical software development practices used by custom instrument builders.
+Instrumental software is often built as one monolithic program that does everything from providing a graphical interface, through hardware interfacing, and writing data files.
+Such software is typically impossible to debug without access to real hardware, often requiring all of the hardware to be available to simply start the program.
+As such, instrumentation software development time is in conflict with valuable data acquisition time.
+The hardware interfaces that these programs implement are typically implemented quickly and without regard to standardization with similar hardware.
+The orchestration routines are intimately tied to the particular hardware configuration of one instrument.
 
-Apache Avro RPC \cite{AvroSpecification} is used to structure the yaq protcol.
+
+Unique experiments will always need custom orchestration and user experience.
+We believe that novel instrumentation development naturally and necessarily includes the creation of targeted user interfaces.
+\yaq{} is architected to encourage better software development practices when creating such interfaces.
+In a \yaq{} context, orchestration code and graphical control interfaces are implemented as clients.
+These clients are automatically simpler because they only need to implement the \yaq{} protocol and do not need to include the vast array of hardware-specific communication protocols.
+Beyond this, the \yaq{} protocol is standardized to provide a common interface for similar hardware.
+A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
+
+Apache Avro RPC \cite{AvroSpecification} is used to structure the \yaq{} protocol.
 Avro RPC is a Remote Procedure Call framework which allows interprocess communication between a client application and a daemon (the server) which has direct hardware access.
 Avro provides an agreed upon standard for efficient serialization of data and method calls from a remote (client) process.
-The protocols defined by Avro are extensible, allowing daemons to define their own data types and declare additional methods that can be processed by the daemon.
-Upon connecting to a client, each daemon provides an Avro Protocol file (avpr) which provides a complete list of the types and allowed methods in a process known as a "handshake".
-yaq uses ``stateful'' Avro RPC to allow multiple requests without requiring additional handshaking.
+Practically, the \yaq{} protocol looks like a collection of methods or functions, which Avro calls ``messages''.
+Each message has defined input parameters and output return types.
+A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
+A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null} '' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
+These self describing messages make up the lowest level functionality of the \yaq{} protocol.
 
-While Avro RPC itself is agnostic to transport layer, yaq specifies TCP sockets as the transport layer.
-TCP socket libraries are ubiquitous, allowing for clients (or daemons) to be implemented in a variety of languages if required.
-The use of TCP also works across standard networks, allowing for simple multi-machine instruments.
+yaq's RPC design invites the creation of multiple client libraries specialized for specific purposes.
+For a yaq instrument it is normal to have multiple clients running simultaneously, each focused on a particular purpose.
+This modularity speeds development and increases overall flexibility of the system.
 
-\subsection{Traits}
 
-\begin{figure}
-  \includegraphics[width=\columnwidth]{./figures/traits.png}
-  \caption{  \label{fig:traits} Traits provide collections of RPC methods that are implemented for multiple kinds of hardware.}
-\end{figure}
-
-Each component of a scientific instrument may have many parameters.
-Similar components typically have similar parameters, but there may be incidental differences between each implementation.
-For example, consider two different monochromators.
-The driver for monochromator A may expose the function "set wavelength", while the driver for monochromator B exposes "set color".
-Any experimentalist wishing to switch from monochromator A to B must first go through their entire codebase to fix all of the small differences in the driver implementation.
-yaq is designed using an (optional) compositional system that helps enforce consistency between different kinds of hardware.
-We call this system ``traits''.
-
-The most basic feature of each trait is a collection of well-defined method signatures, as illustrated by Figure \ref{fig:traits}.
-Here, ``has-position'' is a trait and ``set\_position'' and ``get\_position'' are two method signatures defined by that trait.
-For brevity we only show method names here, but in reality each method signature is fully described as in Figure \ref{fig:methods}.
-Any daemon that wants to implement the ``has-position'' trait must then support those two method signatures.
-Importantly, specific daemons can also implement arbitrary additional methods that are not defined by any trait.
-
+\yaq{} introduces a concept called ``Traits'' which are collections of related messages that are shared among multiple protocols.
+Motors implement the ``has-position'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
+Sensors would implement the ``is-sensor'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''. 
+Protocols which implement a trait must support all of the messages from the trait.
 The trait system was introduced in pursuit of our primary goal of easing the client development process.
 Clients can trust that protocols that implement a given trait will behave in similar ways.
-In Section \ref{sec:clients} we will show how this system makes it easy to write generic clients for a given experiment.
-Each trait is carefully defined through prose and examples by an enhancement proposal system that helps the community to gain consensus and serves as living documentation.
-These enhancement proposals can be found on the yaq website.
-
-\subsection{Daemons}
-
-\begin{figure}
-  \label{fig:daemons}
-  \includegraphics[width=\columnwidth]{./figures/daemons.png}
-  \caption{A collection of yaq daemons, highlighting the traits which each daemon implements.}
-\end{figure}
-
-In yaq, each component of an instrument is supported by a tiny lightweight process that runs in the background of your computer: a daemon.
-Using yaq, a typical instrument has several daemons each supporting a particular component.
-As illustrated in Figure \ref{fig:daemons}, each of these daemons has a single protocol which is typically composed of multiple traits as well as unique methods.
+Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
 The yaq ecosystem is optimized for ease of writing client applications.
 As such, it is expected that each method call over the yaq interface will return rapidly, ensuring that client applications are not blocked for extended periods of time.
@@ -162,33 +169,12 @@ This principle applies even when the method starts an action that might take sev
 In these instances, the initial method simply starts the action and returns, with a separate method provided to retrieve results if they exist.
 In order to know how long to wait, the ``is-daemon`` trait provides a method called ``is\_busy'' which should return "true" while the long running action is not complete, and "false" once it is finished.
 
-In yaq, each component of an instrument can be developed and distributed separately.
-For example, two very different instruments might happen to use the same temperature sensor.
-Because the temperature sensor daemon is its own independent program, both instruments can benefit from the same daemon.
-As yaq grows, the "ecosystem" of existing daemons means that future instruments become easier and easier to develop.
-
-There are currently 62 daemons in the yaq project supporting at least 40 kinds of hardware.
-Because yaq is protocol based, anyone can design and publish new daemons extending our hardware support.
-A living list of all daemons and supported hardware can be found on the yaq website.
-
-\subsection{Clients} \label{sec:clients}
-
-\begin{figure}
-  \label{fig:acquisition}
-  \includegraphics[width=\columnwidth]{./figures/acquisition.png}
-	\caption{Pseudocode of a simple acquisition with one motor and two sensors as described in Figure \ref{fig:daemons}.}
-\end{figure}
-
-yaq's RPC design invites the creation of multiple client libraries specialized for specific purposes.
-For a yaq instrument it is normal to have multiple clients running simultaneously, each focused on a particular purpose.
-This modularity speeds development and increases overall flexibility of the system.
-
-Figure \ref{fig:acquisition} illustrates using pseudocode what a very basic experimental acquisition might look like using yaq.
-Here we have access to the protocols described in Figure \ref{fig:daemons}.
-In the outermost for loop the variable ``pos'' is set to a series of different positions.
-Each loop iteration involves setting a motor, launching a sensor measurement, then recording all independent and dependent variables.
-Because all of these methods are trait-defined, this simple acquisition loop will run as-is for an arbitrary set of motors and sensors.
-While this example is simplified, in practice we have found writing simple scripts to drive experiments to be a very productive approach.
+Several general purpose \yaq{} clients exist.
+\texttt{yaqc}\cite{} is a lightweight Python client which is excellent for using in scripts or any other Python program.
+\texttt{yaqc-qtpy}\cite{} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
+\texttt{yaqc-bluesky}\cite{} provides a bridge to the Bluesky ecosystem\cite{}.
+Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
+Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{}, Instrumental\cite{}, or TRSpectrometer\cite{}.
 
 yaqc [CITE] is a very basic Python client for yaq.
 yaqc is totally generic and aims to support any conceivable yaq daemon.
@@ -199,14 +185,70 @@ yaqc-qtpy provides a ``QClient'' object which uses Qt threading primatives to pr
 In addition, yaqc-qtpy provides a graphical application which automatically populates from arbitrary protocols using traits.
 This is an invaluable tool which provides a ``free'' graphical user interface to any daemon.
 
-Naturally, many scientists would assume that yaq is in competition with other hardware interface layers.
-We, however, do not see yaq as an "either/or" choice, and feel that the self describing nature of yaq coupled with the trait system for shared behavior make for opportunities to bridge between existing projects.
-Bluesky is an extensive open source control layer developed collaboratively across several user facilities \cite{AllanDanielB2019a}.
-yaq provides \texttt{yaqc-bluesky} [CITE] which translates yaq RPC method calls into the equivalent formatting used by Bluesky.
-This allows extraordinary access to the broad array of orchestration and data acquisition capabilities of Bluesky.
-Users of Bluesky can mix-and-match hardware interface layers, and are not required to use only yaq-based hardware.
 
-Additionally, the authors of yaq and the authors of PyMoDaq \cite{WeberSebastien2021a} are in ongoing conversations about how we can best support each other's community and hardware interface options.
+Figure \ref{fig:foundation}...
+Cover scripts, fakes, escape hatches.
+non-excusivity
+
+\begin{figure}
+  \caption{  \label{fig:foundation} A caption}
+\end{figure}
+
+
+\section{Hardware Flexibility}
+
+Research groups tend to be understandably apprehensive about incorporating new hardware into their instrument.
+We previously discussed this issue from the perspective of orchestration and user interface, we now approach the same issue from the perspective of needing to master the new hardware interface itself.
+It is natural to focus more on excellent client experiences because client development is something that every \yaq{} user needs to become familiar with.
+A \yaq{} daemon needs only be implemented once for all instruments, while each specific experiment requires specific client implementation.
+We have worked to make daemon development simple where possible.
+
+The \yaq{} architecture automatically simplifies hardware interface development in several ways.
+First, because daemons are separate and portable programs, the development effort can be spread across the community of \yaq{} users.
+Second, \yaq{} daemon development can be performed separated from the particulars of any individual client.
+Often, this means that initial hardware enablement work can be done on a researchers personal machine before the new hardware peripheral is installed in the instrument.
+Third, when developing trait-compliant protocols, it becomes easy to design and fully test your hardware interface.
+In this instance, you even can use \texttt{yaqc-qtpy} to provide a graphical program to interact with your hardware immediately.
+Finally, as discussed in Section II, \yaq{} gives you options to design using remote hardware or unusual interfaces when necessary.
+
+We have created several tools to aide in daemon development.
+First, a Python library, \texttt{yaqd-core}\cite{}, which implements shared functionality.
+Simple interfaces, such as Brooks MFC\cite{}, can be implemented in as little as 50 lines of Python code.
+Second, \texttt{yaq-traits}\cite{} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
+The format it generates is an important part of how \yaq{} protocols are self describing.
+This shields developers from the details of Apache Avro, which can be somewhat esoteric.
+
+
+\section{Technical Debt}
+
+Years after the original researchers leave, large monolithic acquisition programs become unknowable, undocumented, and unmaintained.
+A graduate student discovers a long standing hard-coded conversion factor that is incorrect years after implementation.
+Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface; newer, cheaper options are readily available.
+A graduate student is forced to meticulously reverse engineer the LabView codebase that they inherited in order to understand the details of their experiment.
+Technical debt grows especially fast in academic environments where graduate students are constantly being replaced.
+
+We have found that the \yaq{} approach favors many small single-purpose applications above large monolithic ones.
+For daemons, the purpose of each application is obvious and unambiguous. 
+There is a strict, well defined interface which explicitly limits the kinds of interactions that are provided to the hardware, thus limiting opportunity for unintended consequences.
+The lack of hardware interface code makes \yaq{} clients much simpler and easier to describe and maintain.
+Tools like \texttt{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing\cite{}.
+Simple, script-based clients written using the expressiveness of Python can be read and understood in hours rather than weeks.
+
+In \yaq{}, each component of an instrument can be developed and distributed separately.
+For example, two very different instruments might happen to use the same temperature sensor.
+Because the temperature sensor daemon is its own independent program, both instruments can benefit from the same daemon.
+As \yaq{} grows, the "ecosystem" of existing daemons means that future instruments become easier and easier to develop.
+Growing this ecosystem is a collaborative effort where many \yaq{} users create portable daemons that they need and share them for the community to use and improve.
+
+There are currently 62 daemons in the yaq project supporting at least 40 kinds of hardware.
+Because yaq is protocol based, anyone can design and publish new daemons extending our hardware support.
+A living list of all daemons and supported hardware can be found on the yaq website.
+
+Software documentation is famously difficult and thankless work.
+\yaq{} attempts do automate daemon documentation as much as possible.
+Our website, \href{https://yaq.fyi}, automatically builds generated protocol reference pages for all known protocols.
+These pages are automatically updated when new versions are published.
+
 
 \section{Case Studies}
 
