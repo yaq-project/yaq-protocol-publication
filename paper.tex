@@ -79,15 +79,14 @@ We have created a new protocol [XKCD] for scientific instrumentation, yaq.
 This protocol attempts to borrow the most important ideas from established projects while retaining simplicity appropriate for small research labs.
 We have built this protocol to be self-describing, portable, and reusable wherever possible.
 Our primary goal has been to make an interface which simplifies orchestration software development as much as possible.
-Here we discuss the design of the yaq ecosystem.
-Several case studies provide a view in to the flexible ways that yaq can be applied to perform very different scientific experiments.
 
-Complex instrumentation is often driven with custom orchestration software written in LabVIEW or Python.
-This software is powerful, but in our experience it often fails to capture all of the unique hardware.
-Scientists find themselves using multiple pieces of software, some developed by manufacturers and some developed in-house, to control their instrument in a piecemeal way.
-Often, there is no single location where a scientist can address all of their hardware in a fully automated fashion.
-This lack of accessibility to automate limits experimental throughput and creativity, increasing the complexity of the user experience.
-
+Here we discuss the design of the yaq protocol in the context of four challenges facing instrument designers.
+First, we discuss how particularly challenging hardware interfaces can become seemingly insurmountable barriers to software control.
+Next, we discuss how inflexible orchestration software can limit experimental flexibility.
+Next, we focus on challenges that arise when enhancing or modifying existing instruments with new hardware.
+Finally, we discuss the heavy software maitenence burden that many instrument designers face.
+In each case we will highlight how the yaq project is designed to aliveate alleviate that challenge.
+Several case studies provide a view into the flexible ways that yaq can be applied to perform very different scientific experiments.
 
 \section{Hardware Interface Challenges}
 
@@ -100,7 +99,7 @@ A specialty camera will only work with an ISA card and drivers for Windows XP.
 A data acquisition manufacturer provides an API that only works in Python 3.7.
 A graduate student wishes to drive some stepper motor using a Raspberry Pi.
 Third barrier: Some hardware interfaces are blocking.
-A graphical user interface while waiting for a camera to collect data.
+A graphical user interface stalls while waiting for a camera to collect data.
 Custom orchestration software needs to be closed before the manufacturers configuration software can be used.
 A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
 
@@ -122,7 +121,8 @@ Besides communicating with the hardware peripheral, each daemon can communicate 
 The four client programs shown in Figure \ref{fig:network} can each communicate with all six hardware peripherals shown.
 As an example, a client running on the bottom computer could communicate with the RS232 peripheral shown in green via the following path: client $\leftrightarrow$ network switch $\leftrightarrow$ top computer $\leftrightarrow$ daemon $\leftrightarrow$ hardware peripheral.
 This powerful architecture can scale down to single computers or up to many computers, including fully remote operator interfaces.
-As we will show, usage of standards and the creation of tooling makes this architecture accessible to instrument builders.
+Superficially, this network-based client-server design is identical to EPICS and TANGO [CITE].
+As we will show, usage of standards and the creation of tooling makes this architecture accessible to instrument builders outside of large facilities.
 
 In \yaq{}, communication between daemons and clients is performed over TCP/IP using a protocol called Apache Avro RPC \cite{AvroSpecification}.
 Avro provides an agreed upon standard for efficient serialization of data and method calls from a remote (client) process.
@@ -286,7 +286,10 @@ This level of collaboration is new to us in the orchestration software space.
 
 \section{Conclusion}
 
-TODO
+The \yaq{} project defines a new general-purpose protocol for hardware control in the context of scientific instrumentation.
+This protocol has some of the powerful features of facility-scale protocols while remaining simple enough for feasable implementation and maintenance in small research labs.
+We have shown how this approach alleviates common problems through discussion and case studies.
+Designing around self-describing protocols is a productive approach that has great promise in scientific software deveopment.
 
 \begin{acknowledgments}
   TODO
