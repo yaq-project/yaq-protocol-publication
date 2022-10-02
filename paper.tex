@@ -55,7 +55,7 @@ secondary publications and for information retrieval purposes.
 Instrumentation development is a key part of the scientific enterprise.
 Novel instruments are typically constructed of many individual components, purchased and home-built.
 Orchestration software must communicate with each hardware component in the course of a scientific experiment.
-This can involve utilization of many protocols: NI DAQmx [CITE], SCPI [CITE], ModBus [CITE], PICam [CITE], Thorlabs APT [CITE], among many others.
+This can involve utilization of many protocols: NI DAQmx\cite{nidaqmx}, SCPI\cite{scpi}, ModBus\cite{modbus}, PICam\cite{picam}, Thorlabs APT\cite{thorlabs_apt}, among many others.
 The challenge of integrating all of these is a frustrating piece of the modern instrument development process.
 Weeks can be spent just integrating one new component into an existing project.
 Code reusability is typically poor, and technical debt grows quickly in academic and educational contexts.
@@ -71,11 +71,11 @@ These projects are impressive at facility scale, but in our experience these do 
 As smaller research labs have grown in experimental complexity, many individual labs have created domain-specific orchestration software.
 Most small custom research instrumentation continues to rely on monolithic software which has hardcorded protocol support for each particular connected device.
 These monolithic applications tend to be very inflexible and difficult to develop.
-In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity [cite many].
+In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity [CITE many].
 While this growth is encouraging, many of these are limited by their focus on particular types of hardware or particular experimental domains.
 To our knowledge, none of these projects take a strict protocol-based approach.
 
-We have created a new protocol [XKCD] for scientific instrumentation, yaq.
+We have created a new protocol for scientific instrumentation, yaq.
 This protocol attempts to borrow the most important ideas from established projects while retaining simplicity appropriate for small research labs.
 We have built this protocol to be self-describing, portable, and reusable wherever possible.
 Our primary goal has been to make an interface which simplifies orchestration software development as much as possible.
@@ -93,7 +93,7 @@ Several case studies provide a view into the flexible ways that yaq can be appli
 Hardware-software interface design presents several technical challenges.
 In this section we describe the architecture of the \yaq{} framework in light of three major barriers that we have encountered in scientific instrumentation development.
 First barrier: Multiple incompatible protocols are used to communicate with each component of the system.
-A fully automated system must be able to use all of these protocols, a daunting task for scientists who do not specialize in software development\cite{}.
+A fully automated system must be able to use all of these protocols, a daunting task for scientists who do not specialize in software development.
 Second barrier: Certain specialty hardware have inconvenient interface requirements.
 A specialty camera will only work with an ISA card and drivers for Windows XP.
 A data acquisition manufacturer provides an API that only works in Python 3.7.
@@ -115,13 +115,13 @@ This might represent a complex scientific instrument involving several operator 
 At the top, a single computer is connected to four hardware peripherals through RS232, TTL, USB, and PCI as indicated by the colored lines.
 That same computer is running four separate programs, one for each peripheral.
 These small, targeted, programs are managed by the operating system and run in the background.
-It is conventional to call such programs ``daemons''\cite{}.
+It is conventional to call such programs ``daemons''\cite{Raymond_1996}.
 The middle computer is connected two two additional peripherals, and runs daemons for each.
 Besides communicating with the hardware peripheral, each daemon can communicate with other programs, ``clients'',  through the network.
 The four client programs shown in Figure \ref{fig:network} can each communicate with all six hardware peripherals shown.
 As an example, a client running on the bottom computer could communicate with the RS232 peripheral shown in green via the following path: client $\leftrightarrow$ network switch $\leftrightarrow$ top computer $\leftrightarrow$ daemon $\leftrightarrow$ hardware peripheral.
 This powerful architecture can scale down to single computers or up to many computers, including fully remote operator interfaces.
-Superficially, this network-based client-server design is identical to EPICS and TANGO [CITE].
+Superficially, this network-based client-server design is identical to EPICS and TANGO \cite{DalesioLR1991a}\cite{AGotz1999TANGOA}.
 As we will show, usage of standards and the creation of tooling makes this architecture accessible to instrument builders outside of large facilities.
 
 In \yaq{}, communication between daemons and clients is performed over TCP/IP using a protocol called Apache Avro RPC \cite{AvroSpecification}.
@@ -196,13 +196,13 @@ Client sophistication can be introduced naturally, as novel experiments are test
 
 
 Several general purpose \yaq{} clients exist.
-\texttt{yaqc}\cite{} is a lightweight Python client which is excellent for using in scripts or any other Python program.
+\texttt{yaqc}\cite{yaqc} is a lightweight Python client which is excellent for using in scripts or any other Python program.
 \texttt{yaqc} is totally generic and aims to support any conceivable \yaq{} daemon.
-\texttt{yaqc-qtpy}\cite{} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
+\texttt{yaqc-qtpy}\cite{yaqc-qtpy} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
 This is an invaluable tool which provides a ``free'' graphical user interface to any daemon.
-\texttt{yaqc-bluesky}\cite{} provides a bridge to the Bluesky ecosystem\cite{}.
+\texttt{yaqc-bluesky}\cite{yaqc-bluesky} provides a bridge to the Bluesky ecosystem\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
-Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{}, Instrumental\cite{}, or TRSpectrometer\cite{}.
+Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
 
 The Landis Group at UW-Madison is currently working on a new type of flow reactor: the Wisconsin Quench Kinetics Reactor (WiQK).
 This reactor incorporates several computer-controlled valves and syringe pumps as well as various sensors.
@@ -235,9 +235,9 @@ In this instance, you even can use \texttt{yaqc-qtpy} to provide a graphical pro
 Finally, as discussed in Section II, \yaq{} gives you options to design using remote hardware or unusual interfaces when necessary.
 
 We have created several tools to aide in daemon development.
-First, a Python library, \texttt{yaqd-core}\cite{}, which implements shared functionality.
-Simple interfaces, such as Brooks MFC\cite{}, can be implemented in as little as 50 lines of Python code.
-Second, \texttt{yaq-traits}\cite{} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
+First, a Python library, \texttt{yaqd-core}\cite{yaqd-core-python}, which implements shared functionality.
+Simple interfaces, such as Brooks MFC\cite{yaqd-brooks-mfc}, can be implemented in as little as 100 lines of Python code.
+Second, \texttt{yaq-traits}\cite{yaq-traits} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
 The format it generates is an important part of how \yaq{} protocols are self describing.
 This shields developers from the details of Apache Avro, which can be somewhat esoteric.
 
@@ -262,7 +262,7 @@ We have found that the \yaq{} approach favors many small single-purpose applicat
 For daemons, the purpose of each application is obvious and unambiguous. 
 There is a strict, well defined interface which explicitly limits the kinds of interactions that are provided to the hardware, thus limiting opportunity for unintended consequences.
 The lack of hardware interface code makes \yaq{} clients much simpler and easier to describe and maintain.
-Tools like \texttt{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing\cite{}.
+Tools like \texttt{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing\cite{yaqd-fakes}.
 Simple, script-based clients written using the expressiveness of Python can be read and understood in hours rather than weeks.
 
 In \yaq{}, each component of an instrument can be developed and distributed separately.
