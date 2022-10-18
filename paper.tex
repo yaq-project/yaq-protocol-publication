@@ -181,15 +181,14 @@ The orchestration routines are intimately tied to the particular hardware config
 
 Unique experiments will always need custom orchestration and user experience.
 We believe that novel instrumentation development naturally and necessarily includes the creation of targeted software.
+Developing experimental software is an iterative process tied to the scientific goals of the instrument.
+Often experimentalists must apply their specialty scientific knowledge to develop this software.\cite{SegalJudith2005a}
 \yaq{} is architected to encourage better software development practices when creating such programs.
 In a \yaq{} context, orchestration code and graphical control interfaces are implemented as clients.
 These clients are automatically simpler because they only need to implement the \yaq{} standard and do not need to include the vast array of hardware-specific communication interfaces.
 Beyond this, clients can use traits to interact with similar hardware identically.
 A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
 
-A \yaq{} client can scale in complexity from a small, lightweight script all the way to a complicated graphical program, as shown in Figure \ref{fig:foundation}.
-At the bottom, the daemons lay a solid foundation to build the variety of clients on top of.
-Client sophistication can be introduced naturally, as novel experiments are tested and refined.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figures/client_spectrum},
@@ -197,15 +196,31 @@ Client sophistication can be introduced naturally, as novel experiments are test
 \end{figure}
 
 
+A \yaq{} client can scale in complexity from a small, lightweight script all the way to a complicated graphical program, as shown in Figure \ref{fig:foundation}.
+At the bottom, we represent the most lightweight interface to \yaq{}, Python scripting.
+\texttt{yaqc}\cite{yaqc} is a Python client which is excellent for using in scripts or any other Python program.
+The code shown creates three client objects which could be used directly through an interactive Python prompt or in a reusable script.
+Each client object provides Python methods for each Avro message specified by the associated protocol.
 
-Several general purpose \yaq{} clients exist.
-\texttt{yaqc}\cite{yaqc} is a lightweight Python client which is excellent for using in scripts or any other Python program.
-\texttt{yaqc} is totally generic and aims to support any conceivable \yaq{} daemon.
+In the middle, the same three hardware peripherals are represented in an interactive, graphical form.
 \texttt{yaqc-qtpy}\cite{yaqc-qtpy} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
-This is an invaluable tool which provides a ``free'' graphical user interface to any daemon.
-\texttt{yaqc-bluesky}\cite{yaqc-bluesky} provides a bridge to the Bluesky ecosystem\cite{AllanDanielB2019a}.
+The self describing \yaq{} interface built using protocols and traits is used to provide interface elements for the most commonly used messages.
+This is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
+
+At the top, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
+Bluesky is a framework which allows users to implement their own experimental procedures.
+Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a bluesky procedure and a representation of the resultant data.
+\texttt{yaqc-bluesky}\cite{yaqc-bluesky} provides a bridge to the Bluesky ecosystem.
 Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
+
+All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
+All types of clients can be used simultaneously to interact with the same instrument in different modes.
+Client sophistication can be introduced naturally, as novel experiments are tested and refined.
+Different clients can specialize for different requirements of a custom instrument
+For example, \texttt{yaqc-qtpy} can provide a quick interface for setting and viewing hardware positions while Bluesky can focus on experimental data acquisition.
+
+
 
 The Landis Group at UW-Madison is currently working on a new type of flow reactor: the Wisconsin Quench Kinetics Reactor (WiQK).
 This reactor incorporates several computer-controlled valves and syringe pumps as well as various sensors.
@@ -217,7 +232,7 @@ These lightweight scripts can be extensively refactored by the experimentalists 
 This approach ensures that the Landis Group is not slowed down by complex, inflexible orchestration software.
 Once the reactor is complete, more sophisticated graphical clients will be created to accommodate end users who were not involved as the reactor was built.
 
-The Wright Group at UW-Madison needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments \cite{MukamelShaul2000a, WrightJohnCurtis2011a}.
+The Wright Group at UW-Madison needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments \cite{Mukamel/Shaul2000a, WrightJohnCurtis2011a}.
 This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
@@ -244,6 +259,10 @@ Second, \texttt{yaq-traits}\cite{yaq-traits} is a command line application which
 The format it generates is an important part of how \yaq{} protocols are self describing.
 This shields developers from the details of Apache Avro, which can be somewhat esoteric.
 
+There are currently XX daemons in the yaq project supporting at least YY kinds of hardware.
+Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
+A living list of all daemons and supported hardware can be found on the yaq website.
+
 The Stahl Group at UW-Madison created a custom reactor which monitors gasses being produced or consumed in the reaction head-space.  \cite{SalazarChaseA2021a}
 This reactor incorporates a collection of sensitive pressure transducers and a single heating process value under computer control.
 yaq daemons are used to interface with each sensor and the heater controller.
@@ -259,14 +278,16 @@ Years after the original researchers leave, large monolithic acquisition program
 A graduate student discovers a long standing hard-coded conversion factor that is incorrect years after implementation.
 Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface; newer, cheaper oscilloscopes are readily available.
 A graduate student is forced to meticulously reverse engineer the LabView codebase that they inherited in order to understand the details of their experiment.
-Technical debt grows especially fast in academic environments where graduate students are constantly being replaced.
+Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{}
+Technical debt grows especially fast in academic environments where graduate students are involved in projects for a limited time.
 
-We have found that the \yaq{} approach favors many small single-purpose applications above large monolithic ones.
+The \yaq{} approach favors many small single-purpose applications above large monolithic ones.
 For daemons, the purpose of each application is obvious and unambiguous. 
 There is a strict, well defined interface which explicitly limits the kinds of interactions that are provided to the hardware, thus limiting opportunity for unintended consequences.
 The lack of hardware interface code makes \yaq{} clients much simpler and easier to describe and maintain.
-Tools like \texttt{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing\cite{yaqd-fakes}.
+Tools like \texttt{yaqd-fakes}\cite{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing.
 Simple, script-based clients written using the expressiveness of Python can be read and understood in hours rather than weeks.
+Integrations with communities like Bluesky offer powerful features which are actively maintained across many institutions.
 
 In \yaq{}, each component of an instrument can be developed and distributed separately.
 For example, two different instruments might happen to use the same temperature sensor.
@@ -274,16 +295,16 @@ Because the temperature sensor daemon is its own independent program, both instr
 As \yaq{} grows, the "ecosystem" of existing daemons means that future instruments become easier and easier to develop.
 Growing this ecosystem is a collaborative effort where many \yaq{} users create portable daemons that they need and share them for the community to use and improve.
 
-There are currently XX daemons in the yaq project supporting at least YY kinds of hardware.
-Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
-A living list of all daemons and supported hardware can be found on the yaq website.
-
 Software documentation is famously difficult and thankless work.
 \yaq{} attempts do automate daemon documentation as much as possible.
 Our website, https://yaq.fyi, automatically builds generated reference pages for all known protocols.
 These pages are automatically updated when new versions are published.
 
-yaq is also being used in several smaller ways throughout UW-Madison Chemistry.
+\yaq{} is open source software.
+Anyone can view, install, edit, and suggest changes to our growing collection of daemons and clients.
+ZZ individuals have contributed to the development of \yaq{}.
+
+\yaq{} is also being used in several smaller ways throughout UW-Madison Chemistry.
 Excitingly, all of these research groups are able easily benefit from each-other's daemon developments.
 This level of collaboration is new to us in the orchestration software space.
 
