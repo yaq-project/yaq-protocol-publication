@@ -1,6 +1,7 @@
 # LaTeX
 *.aux
 *.log
-*.pdf
+#*.pdf
 *.bbl
 *.blg
+paperNotes.bib
