@@ -60,7 +60,7 @@ Instrumentation development is a key part of the scientific enterprise.
 Novel instruments are typically constructed of many individual components, purchased and home-built.
 Orchestration software must communicate with each hardware component in the course of a scientific experiment.
 This can involve utilization of many interfaces: NI DAQmx\cite{nidaqmx}, SCPI\cite{scpi}, ModBus\cite{modbus}, PICam\cite{picam}, Thorlabs APT\cite{thorlabs_apt}, among many others.
-The challenge of integrating all of these is a frustrating piece of the modern instrument development process.
+The process of integrating these is an important but time-consuming step of modern instrument and systems development.
 Weeks can be spent just integrating one new component into an existing project.
 In small academic labs, these software interfaces are typically created by student researchers without software development experience.
 Student researchers rarely focus on software reusability, and a lack of maitenence and documentation can make such software more difficult to use as time goes on.
@@ -80,8 +80,8 @@ Most small custom research instrumentation continues to rely on monolithic softw
 These monolithic applications tend to be inflexible and difficult to develop.
 %To our knowledge, there are no existing open source projects that attempt to define a unified standard for hardware control of small scale experiments.
 
-We have created a new network-based standard for scientific instrumentation, \yaq{}.
-This standard borrows the most important ideas from established projects used by large user facilities while retaining simplicity appropriate for small research labs.
+We have created a novel network-based standard for scientific instrumentation, called \yaq{}.  This standard borrows the most important ideas from
+ established projects used by large user facilities while retaining simplicity appropriate for small research labs.
 We have built this standard to be self-describing, portable, and reusable wherever possible.
 Our primary goal has been to make an interface which simplifies orchestration software development as much as possible.
 
@@ -152,13 +152,20 @@ The trait system was introduced in pursuit of our primary goal of easing the cli
 Clients can trust that protocols that implement a given trait will behave in similar ways.
 The standardized \yaq{} interface presents the same set of interactions for client-side scientific code, simplifying the experience of using hardware.
 
-The second hardware interface barrier: Certain specialty hardware have inconvenient interface requirements.
+The second hardware interface barrier: Reduction of the interfacing code to an easier-to-manage subset of that available.  Here, we implement an approach useful for
+systems integration in the sciences which we call a Minimal Programming Interface (MPI).   The MPI is essentially a reduced set of functions found in the hardware API.   The MPI 
+ is defined as the minimal set of API functions for a given hardware component concluded by the researchers as necessary for the fuller system development. 
+ The value of this MPI is that it can be formed by wrapping and/or converting the API from its native language into a language known to be transparent to researchers, such as the programming
+ language Python.  The \yaq{} traits feature acts as a tool in exposing the MPI from the base APIs often supplied by the hardware manufacturer, as the traits
+ automatically define the primary set of key functions, and any additionally required functions are added by the researcher on top of the primary set.
+
+The third hardware interface barrier: Certain specialty hardware have inconvenient interface requirements.
 Since \yaq{} enables multiple machines, any hardware requirements can be addressed by putting a machine for that specific hardware on the network.
 For example, the Windows XP computer which has the obsolete interface card and drivers can be placed into a private network with only \yaq{} interface communication.
 Because each \yaq{} daemon is running in its own process, the software environment can be tailored to its needs.
 A client running up to date Python 3.10 communicates seamlessly with a daemon running Python 3.7.
 
-The third hardware interface barrier: Some hardware interfaces are blocking.
+The fourth hardware interface barrier: Some hardware interfaces are blocking.
 Monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become both critical and elusive errors.
 In \yaq{}, each daemon is only responsible for a single hardware interface.
 %Each \yaq{} daemon runs as a separate process (possibly not even on the same machine) and thus many of the hard concurrency problems with communicating with hardware are mitigated.
