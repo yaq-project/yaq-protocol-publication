@@ -100,11 +100,13 @@ Refer to the \yaq{} website for a formal specification of the \yaq{} standard.\c
 In this section we describe the architecture of the \yaq{} framework in light of three major barriers that we have encountered in scientific instrumentation development.
 First barrier: Multiple interfaces are used to communicate with each component of the system.
 A fully automated system must be able to use all of these interfaces, a daunting task for scientists who do not specialize in software development.
-Second barrier: Certain specialty hardware have inconvenient interface requirements.
+Second barrier: Coding interfaces adds to a maintenance overhead seldom manageable by researchers.   Updates to the hardware and operating systems often
+require maintenance updates to interfacing code that is not maintainable as researchers are not usually delegated to be strictly software maintainers.
+Third barrier: Certain specialty hardware have inconvenient interface requirements.
 A camera will only work with an obsolete interface card and drivers for Windows XP.
 A data acquisition manufacturer provides an Application Programmer Interface (API) that only works in Python 3.7.
 A graduate student wishes to drive several stepper motors using a Raspberry Pi.
-Third barrier: Some hardware interfaces are blocking.
+Fourth barrier: Some hardware interfaces are blocking.
 A graphical user interface stalls while waiting for a camera to collect data.
 Custom orchestration software needs to be closed before the manufacturers configuration software can be used.
 A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
@@ -152,7 +154,7 @@ The trait system was introduced in pursuit of our primary goal of easing the cli
 Clients can trust that protocols that implement a given trait will behave in similar ways.
 The standardized \yaq{} interface presents the same set of interactions for client-side scientific code, simplifying the experience of using hardware.
 
-The second hardware interface barrier: Reduction of the interfacing code to an easier-to-manage subset of that available.  Here, we implement an approach useful for
+The second hardware interface barrier:  Coding interfaces adds to a maintenance overhead seldom manageable by researchers.  Here, we implement an approach useful for
 systems integration in the sciences which we call a Minimal Programming Interface (MPI).   The MPI is essentially a reduced set of functions found in the hardware API.   The MPI 
  is defined as the minimal set of API functions for a given hardware component concluded by the researchers as necessary for the fuller system development. 
  The value of this MPI is that it can be formed by wrapping and/or converting the API from its native language into a language known to be transparent to researchers, such as the programming
