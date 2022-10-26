@@ -1,8 +1,4 @@
-%  1)  latex  paper
-%  2)  bibtex paper
-%  3)  latex  paper
-%  4)  latex  paper
-%
+
 \documentclass[aip, amsmath, amssymb, reprint,]{revtex4-1} % consider using RevTex4.2
 
 \usepackage{graphicx}
@@ -44,13 +40,12 @@
 
 \begin{abstract}
 
-
 Modern instrumentation development often involves incorporation of many dissimilar hardware peripherals into a single unified instrument.
 Increasing modular, commercial hardware availability has brought greater instrument complexity to small research groups.
 The flexibility promised to instrument makers by large hardware availability stretches the capability of traditional, monolithic orchestration software.
 In many cases, a lack of software flexibility leads creative researchers to feel frustrated and unable to perform the experiments they envision even when highly modular hardware components enable extreme experimental flexibility.
 Herein, we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
-\yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex instruments.
+\yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex in
 \yaq{} is architected to overcome hardware communication barriers that are insurmountable with typical experimental software.
 A large number of hardware peripherals are already supported with tooling available to create more.
 The \yaq{} standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
@@ -67,15 +62,16 @@ Orchestration software must communicate with each hardware component in the cour
 This can involve utilization of many interfaces: NI DAQmx\cite{nidaqmx}, SCPI\cite{scpi}, ModBus\cite{modbus}, PICam\cite{picam}, Thorlabs APT\cite{thorlabs_apt}, among many others.
 The challenge of integrating all of these interfaces is a frustrating piece of the modern instrument development process.
 Weeks can be spent just integrating one new component into an existing project.
-Code reusability is typically poor, and technical debt grows quickly in academic and educational contexts.
+In small academic labs, these software interfaces are typically created by student researchers without software development experience.
+Student researchers rarely focus on software reusability, and a lack of maitenence and documentation can make such software more difficult to use as time goes on.
 Scientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
 
 Some large user-facilities have addressed interface complexity via the adoption of unified standards, such as EPICS \cite{DalesioLR1991a} or TANGO \cite{AGotz1999TANGOA}.
 The unified standards define a network interface for any hardware component.
-Orchestration software can target this unified standards for reading and writing hardware state.
+Orchestration software can target these unified standards for reading and writing hardware state.
 Small background services are written to translate the myriad component interfaces into the standard EPICS IOCs and TANGO Devices.
-These programs are performant, but require expert management to set up and provide descriptions via a separate server program.
-These projects are impressive at facility scale, but in our experience these do not scale well to single-investigator lab environments.
+These programs are performant, open source, and have huge libraries of exisiting hardware interface support, but require expert management to set up and provide descriptions via a separate server program.
+In our experience EPICS and TANGO do not scale well to single-investigator lab environments.
 
 As smaller research labs have grown in experimental complexity, many individual labs have created domain-specific orchestration software.
 In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity\cite{WeberSebastien2021a,Bogdanowicz2022,trspectrometer,Koerner_2019,Campagnola_2014,pymeasure,Giesbrecht_2022,pylablib}.
@@ -96,11 +92,11 @@ Then, we focus on challenges that arise when enhancing or modifying existing ins
 Finally, we discuss the heavy software maintenance burden that many instrument designers face.
 In each case, we will highlight how the \yaq{} project is designed to alleviate that challenge.
 Several case studies provide a view into the flexible ways that \yaq{} can be applied to perform different scientific experiments.
-This document provides an overview of the concepts and motivations behind \yaq{}, but does not serve as a formal specification, which is hosted at \cite{yaq_fyi}. % citation does not compile 
+This paper provides an overview of the concepts and motivations behind \yaq{}.
+Refer to the \yaq{} website for a formal specification of the \yaq{} standard.\cite{yaq_fyi}
 
 \section{Hardware Interface Challenges}
 
-Hardware-software interface design presents several technical challenges.
 In this section we describe the architecture of the \yaq{} framework in light of three major barriers that we have encountered in scientific instrumentation development.
 First barrier: Multiple interfaces are used to communicate with each component of the system.
 A fully automated system must be able to use all of these interfaces, a daunting task for scientists who do not specialize in software development.
@@ -130,7 +126,7 @@ The middle computer is connected to two additional peripherals, and runs daemons
 Besides communicating with the hardware peripheral, each daemon can communicate with other programs, ``clients'',  through the network.
 The four client programs shown in Figure \ref{fig:network} can each communicate with all six hardware peripherals shown.
 As an example, a client running on the bottom computer could communicate with the RS232 peripheral shown in green via the following path: client $\leftrightarrow$ network switch $\leftrightarrow$ top computer $\leftrightarrow$ daemon $\leftrightarrow$ hardware peripheral.
-This powerful architecture can scale down to a single computer or up to many networked computers, including fully remote operator interfaces.
+This powerful architecture can be used on a single computer or used across many networked computers, including fully remote operator interfaces.
 This client-server architecture offers similar network capabilities to EPICS and TANGO.
 As we will show, usage of standards and the creation of tooling makes this architecture accessible to instrument builders outside of large facilities.
 
@@ -146,14 +142,15 @@ Each daemon supports a collection of messages for its unique functionality, call
 
 \yaq{} introduces a concept called ``Traits'' which are collections of related messages that are shared among multiple protocols.
 Motors implement the ``has-position'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
-Sensors would implement the ``is-sensor'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''. 
+Sensors would implement the ``is-sensor'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''.
 Protocols which implement a trait must support all of the messages from the trait.
 Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
 The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings 
 \yaq{} provides a unified TCP/IP interface to all hardware peripherals based on the well-described Avro RPC protocol.
-In particular, the trait system was introduced in pursuit of our primary goal of easing the client development process.
+The trait system was introduced in pursuit of our primary goal of easing the client development process.
 Clients can trust that protocols that implement a given trait will behave in similar ways.
+The standardized \yaq{} interface presents the same set of interactions for client-side scientific code, simplifying the experience of using hardware.
 
 The second hardware interface barrier: Certain specialty hardware have inconvenient interface requirements.
 Since \yaq{} enables multiple machines, any hardware requirements can be addressed by putting a machine for that specific hardware on the network.
@@ -162,7 +159,7 @@ Because each \yaq{} daemon is running in its own process, the software environme
 A client running up to date Python 3.10 communicates seamlessly with a daemon running Python 3.7.
 
 The third hardware interface barrier: Some hardware interfaces are blocking.
-Monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become difficult to find and can lead to critical errors.
+Monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become both critical and elusive errors.
 In \yaq{}, each daemon is only responsible for a single hardware interface.
 %Each \yaq{} daemon runs as a separate process (possibly not even on the same machine) and thus many of the hard concurrency problems with communicating with hardware are mitigated.
 It is expected that each message call over the \yaq{} interface will return rapidly, ensuring that client applications are not blocked for extended periods of time.
@@ -171,7 +168,6 @@ In these instances, the initial message simply starts the action and returns, wi
 In order to know how long to wait, the ``is-daemon`` trait provides a message called ``is\_busy'' which should return "true" while the long running action is not complete, and "false" once it is finished.
 Additionally, multiple clients can communicate with the same daemon simultaneously.
 A complex instrument may involve multiple operators watching sensor data in real time, while one program is orchestrating the hardware and recording the data.
-
 
 \section{Experimental Flexibility}
 
@@ -187,7 +183,6 @@ As such, instrumentation software development time is in conflict with valuable 
 The hardware interfaces that these programs implement are typically made quickly and without regard to standardization with similar hardware.
 The orchestration routines are intimately tied to the particular hardware configuration of one instrument.
 
-
 Unique experiments will always need custom orchestration and user experience.
 We believe that novel instrumentation development naturally and necessarily includes the creation of targeted software.
 Developing experimental software is an iterative process tied to the scientific goals of the instrument.
@@ -198,12 +193,10 @@ These clients are automatically simpler because they only need to implement the 
 Beyond this, clients can use traits to interact with similar hardware identically.
 A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
 
-
 \begin{figure}
 \includegraphics[width=\columnwidth]{figures/client_spectrum},
 	\caption{  \label{fig:foundation} \yaq{} scales from simple scripts to integrations with featureful frameworks.}
 \end{figure}
-
 
 A \yaq{} client can scale in complexity from a small, lightweight script all the way to a complicated graphical program, as shown in Figure \ref{fig:foundation}.
 At the bottom, we represent the most lightweight interface to \yaq{}, Python scripting.
@@ -218,7 +211,6 @@ This is an invaluable tool which provides a ``free'' graphical user interface (G
 
 At the top, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
-Bluesky is a framework which allows users to implement their own experimental procedures.
 Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data.
 \texttt{yaqc-bluesky}\cite{yaqc-bluesky} provides a bridge to the Bluesky ecosystem.
 Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
@@ -228,8 +220,6 @@ All types of clients can be used simultaneously to interact with the same instru
 Client sophistication can be introduced naturally, as novel experiments are tested and refined.
 Different clients can specialize for different requirements of a custom instrument
 For example, \texttt{yaqc-qtpy} can provide a quick interface for setting and viewing hardware positions while Bluesky can focus on experimental data acquisition.
-
-
 
 The Landis Group at UW-Madison is currently working on a new type of flow reactor: the Wisconsin Quench Kinetics Reactor (WiQK).
 This reactor incorporates several computer-controlled valves and syringe pumps as well as various sensors.
@@ -245,21 +235,21 @@ The Wright Group at UW-Madison needs to orchestrate a large variety of hardware 
 This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
-The same client is used on four laser systems, each with different complements of hardware.
-Moving forward, the Wright Group hopes to spend less energy developing control software and more energy developing creative spectroscopy experiments.
-
-
+Remote client development on viritual hardware has allowed client design to proceed without delaying ongling experiments.
+Clients developed by the Wright Group have proved flexible enough to be used on four laser systems, each with different complements of hardware.
+Moving forward, the Wright Group will spend less energy developing control software and more energy developing creative spectroscopy experiments.
 
 \section{Incorporating New Hardware}
 
 In a \yaq{} context, new hardware can be incorporated into an instrument through the addition of a new daemon.
-The \yaq{} architecture automatically simplifies hardware interface development in several ways.
+The \yaq{} architecture simplifies hardware interface development in several ways.
 First, because daemons are separate and portable programs, the development effort can be spread across the community of \yaq{} users.
 Often, researchers can download an existing daemon rather than writing a new one.
 Second, \yaq{} daemon development can be performed separated from the particulars of any individual client.
 Often, this means that initial hardware enablement work can be done on a researchers personal machine before the new hardware peripheral is installed in the instrument.
 Third, when developing trait-compliant protocols, it becomes easy to design and fully test your hardware interface.
-In this instance, you even can use \texttt{yaqc-qtpy} to provide a graphical program to interact with your hardware immediately.
+Traits are unambiguous and well-described, making an obvious target for development.
+Tooling exists to verify full trait compliance, for example you can use \texttt{yaqc-qtpy} to provide a graphical program to interact with your hardware immediately.
 Finally, as discussed in Section II, \yaq{} gives you options to design using remote hardware or unusual interfaces when necessary.
 
 We have created several tools to aide in daemon development.
@@ -278,7 +268,8 @@ This shields developers from the details of Apache Avro, which can be somewhat e
 \end{figure}
 
 Figure \ref{fig:histogram} shows the distribution of unique lines of Python code written to implement each of the daemons in our current ecosystem.
-While lines of code is an imperfect metric, we use it here to try and represent the amount of work required to create a daemon for a new hardware peripheral.
+
+While lines of code is an imperfect metric, we use it here to represent the amount of work required to create a daemon for a new hardware peripheral.
 Most interfaces, such as Brooks MFC\cite{yaqd-brooks-mfc}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
 Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{}.
@@ -293,20 +284,19 @@ This reactor incorporates a collection of sensitive pressure transducers and a s
 Recently, experimentalists have been attempting reactions involving smaller, slower, pressure changes.
 A fundamental flaw in the initial analog to digital converter board was revealed by these attempts.
 As a result, a new digitizer has been purchased.
-This new converter will be incorporated into the existing reactor without modifying the existing graphical user interface and data recording program, minimizing downtime.
-
+This new digitizer will be incorporated into the existing reactor without modifying the existing graphical user interface and data recording program, minimizing downtime.
 
 \section{Technical Debt}
 
 Years after the original researchers leave, large monolithic acquisition programs become unknowable, undocumented, and unmaintained.
 A graduate student discovers a long standing hard-coded conversion factor that is incorrect years after implementation.
-Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface; newer, cheaper oscilloscopes are readily available.
+Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface while newer, cheaper oscilloscopes are readily available.
 A graduate student is forced to meticulously reverse engineer the LabVIEW codebase that they inherited in order to understand the details of their experiment.
 Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{}
 Technical debt grows especially fast in academic environments where graduate students are involved in projects for a limited time.
 
 The \yaq{} approach favors many small single-purpose applications above large monolithic ones.
-For daemons, the purpose of each application is obvious and unambiguous. 
+For daemons, the purpose of each application is obvious and unambiguous.
 There is a strict, well defined interface which explicitly limits the kinds of interactions that are provided to the hardware, thus limiting opportunity for unintended consequences.
 The lack of hardware interface code makes \yaq{} clients much simpler and easier to describe and maintain.
 Tools like \texttt{yaqd-fakes}\cite{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing.
@@ -316,8 +306,8 @@ Integrations with communities like Bluesky offer powerful features which are act
 In \yaq{}, each component of an instrument can be developed and distributed separately.
 For example, two different instruments might happen to use the same temperature sensor.
 Because the temperature sensor daemon is its own independent program, both instruments can benefit from the same daemon.
-As \yaq{} grows, the "ecosystem" of existing daemons means that future instruments become easier and easier to develop.
-Growing this ecosystem is a collaborative effort where many \yaq{} users create portable daemons that they need and share them for the community to use and improve.
+The growing ``ecosystem'' of \yaq{} daemons make future instruments easier and easier to develop.
+Growing this ecosystem is a collaborative effort where many \yaq{} users create portable daemons that they need and share them with the community where they will be used and improved.
 
 Software documentation is famously difficult and thankless work.
 \yaq{} attempts to automate daemon documentation as much as possible.
