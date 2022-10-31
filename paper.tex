@@ -102,18 +102,18 @@ In this section we describe the architecture of the \yaq{} framework in light of
 A fully automated system must be able to use all of these interfaces, a daunting task for scientists who do not specialize in software development.
 \textit{Second barrier: Coding interfaces adds to a maintenance overhead seldom manageable by researchers.}   Updates to the hardware and operating systems often
 require maintenance updates to interfacing code that is not maintainable as researchers are not usually delegated to be strictly software maintainers.
-\texit{Third barrier: Certain specialty hardware have inconvenient interface requirements.}
+\textit{Third barrier: Certain specialty hardware have inconvenient interface requirements.}
 A camera will only work with an obsolete interface card and drivers for Windows XP.
 A data acquisition manufacturer provides an Application Programmer Interface (API) that only works in Python 3.7.
 A graduate student wishes to drive several stepper motors using a Raspberry Pi.
-\texit{Fourth barrier: Some hardware interfaces are blocking.}
+\textit{Fourth barrier: Some hardware interfaces are blocking.}
 A graphical user interface stalls while waiting for a camera to collect data.
 Custom orchestration software needs to be closed before the manufacturers configuration software can be used.
 A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
 
 \begin{figure}
 	\includegraphics[width=\columnwidth]{figures/network2}
-\caption{\label{fig:network2} Networking diagram}
+\caption{\label{fig:network} Networking diagram}
 \end{figure}
 
 Figure \ref{fig:network} diagrams the \yaq{} architecture.
