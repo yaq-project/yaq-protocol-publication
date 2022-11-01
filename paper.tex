@@ -1,5 +1,4 @@
-
-\documentclass[aip, amsmath, amssymb, reprint,]{revtex4-1} % consider using RevTex4.2
+\documentclass[aip, amsmath, amssymb, reprint,]{revtex4-2}
 
 \usepackage{graphicx}
 \usepackage{dcolumn}
@@ -41,11 +40,11 @@
 \begin{abstract}
 
 Modern instrumentation development often involves incorporation of many dissimilar hardware peripherals into a single unified instrument.
-Increasing modular, commercial hardware availability has brought greater instrument complexity to small research groups.
+Increasing availability of modular hardware has brought greater instrument complexity to small research groups.
 The flexibility promised to instrument makers by large hardware availability stretches the capability of traditional, monolithic orchestration software.
-In many cases, a lack of software flexibility leads creative researchers to feel frustrated and unable to perform the experiments they envision even when highly modular hardware components enable extreme experimental flexibility.
-Herein, we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
-\yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex in
+In many cases, a lack of software flexibility leads creative researchers to feel frustrated, unable to perform experiments they envision.
+Herein we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
+\yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex instruments.
 \yaq{} is architected to overcome hardware communication barriers that are insurmountable with typical experimental software.
 A large number of hardware peripherals are already supported with tooling available to create more.
 The \yaq{} standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
@@ -146,7 +145,7 @@ Sensors would implement the ``is-sensor'' trait which defines ``\texttt{get\_mea
 Protocols which implement a trait must support all of the messages from the trait.
 Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
-The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings 
+The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings
 \yaq{} provides a unified TCP/IP interface to all hardware peripherals based on the well-described Avro RPC protocol.
 The trait system was introduced in pursuit of our primary goal of easing the client development process.
 Clients can trust that protocols that implement a given trait will behave in similar ways.
@@ -154,7 +153,7 @@ The standardized \yaq{} interface presents the same set of interactions for clie
 
 The second hardware interface barrier: Certain specialty hardware have inconvenient interface requirements.
 Since \yaq{} enables multiple machines, any hardware requirements can be addressed by putting a machine for that specific hardware on the network.
-For example, the Windows XP computer which has the obsolete interface card and drivers can be placed into a private network with only \yaq{} interface communication.
+The Raspberry Pi which drives several stepper motors can be placed onto a private network to communicate with the primary instrument computer using \yaq{}.
 Because each \yaq{} daemon is running in its own process, the software environment can be tailored to its needs.
 A client running up to date Python 3.10 communicates seamlessly with a daemon running Python 3.7.
 
@@ -235,7 +234,7 @@ The Wright Group at UW-Madison needs to orchestrate a large variety of hardware 
 This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
-Remote client development on virtual hardware has allowed client design to proceed without delaying ongoing experiments.
+This allows Wright Group researchers to create polished client interfaces without interrupting  ongoing experiments.
 Clients developed by the Wright Group have proved flexible enough to be used on four laser systems, each with different complements of hardware.
 Moving forward, the Wright Group will spend less energy developing control software and more energy developing creative spectroscopy experiments.
 
@@ -268,7 +267,6 @@ This shields developers from the details of Apache Avro, which can be somewhat e
 \end{figure}
 
 Figure \ref{fig:histogram} shows the distribution of unique lines of Python code written to implement each of the daemons in our current ecosystem.
-
 While lines of code is an imperfect metric, we use it here to represent the amount of work required to create a daemon for a new hardware peripheral.
 Most interfaces, such as Brooks MFC\cite{yaqd-brooks-mfc}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
@@ -289,7 +287,7 @@ This new digitizer will be incorporated into the existing reactor without modify
 \section{Technical Debt}
 
 Years after the original researchers leave, large monolithic acquisition programs become unknowable, undocumented, and unmaintained.
-A graduate student discovers a long standing hard-coded conversion factor that is incorrect years after implementation.
+A graduate student discovers a hard-coded conversion factor that is incorrect years after implementation.
 Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface while newer, cheaper oscilloscopes are readily available.
 A graduate student is forced to meticulously reverse engineer the LabVIEW codebase that they inherited in order to understand the details of their experiment.
 Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{}
@@ -316,8 +314,11 @@ These pages are automatically updated when new versions are published.
 
 \yaq{} is open source software.
 Anyone can view, install, edit, and suggest changes to our growing collection of daemons and clients.
+Furthermore, anyone can create their own totally-custom client or daemon software separately by following the specified \yaq{} standard.
 Thirteen individuals have contributed code to the development of \yaq{}.
-
+Open-source development can be a powerful approach for research communities looking to share software-development and maintenance burdens. \cite{CohenJeremy2021a}
+It is our hope that a vibrant open-source community will form around \yaq{}.
+While open-source development is not a panacea \cite{NowogrodzkiAnna2019a}, we hope that by maintaining a distributed development strategy with a strict focus on only hardware interfaces the \yaq{} project might prove sustainable.
 
 \section{Conclusion}
 
@@ -335,7 +336,7 @@ Designing around self-describing protocols is a productive approach that has gre
 Data sharing is not applicable to this article as no new data were created or analyzed in this study.
 
 \section*{References}
-% all yaq,yaqc,and yaqd citations have an unfilled "()" in them... 
+% all yaq,yaqc,and yaqd citations have an unfilled "()" in them...
 \nocite{*}
 \bibliography{references}
 
