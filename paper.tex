@@ -23,11 +23,11 @@
 
 \preprint{AIP/123-QED}
 
-\title{The yaq Project: \\ A Standard for Scientific Instrumentation}
+\title{The yaq Project: \\ Standardized Software Enabling Flexible Instrumentation}
 \author{Kyle F. Sunden}
 \author{Daniel D. Kohler}
 \author{Kent A. Meyer}
-\author{Peter L. Cruz Parilla}
+\author{Peter L. Cruz Parrilla}
 \author{John C. Wright}
 \author{Blaise J. Thompson}
 \affiliation{
@@ -41,12 +41,13 @@
 
 Modern instrumentation development often involves incorporation of many dissimilar hardware peripherals into a single unified instrument.
 Increasing availability of modular hardware has brought greater instrument complexity to small research groups.
-The flexibility promised to instrument makers by large hardware availability stretches the capability of traditional, monolithic orchestration software.
+%The flexibility promised to instrument makers by large hardware availability stretches the capability of traditional, monolithic orchestration software.
+This complexity stretches the capability of traditional, monolithic orchestration software.
 In many cases, a lack of software flexibility leads creative researchers to feel frustrated, unable to perform experiments they envision.
 Herein we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
 \yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex instruments.
-\yaq{} is architected to overcome hardware communication barriers that are insurmountable with typical experimental software.
-A large number of hardware peripherals are already supported with tooling available to create more.
+\yaq{} is designed to overcome hardware communication barriers that are insurmountable with typical experimental software.
+A large number of hardware peripherals are already supported, with tooling available to expand support.
 The \yaq{} standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
 
 \end{abstract}
@@ -140,8 +141,8 @@ Each individual communication between client and daemon involves one message bei
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
 
 \yaq{} introduces a concept called ``Traits'' which are collections of related messages that are shared among multiple protocols.
-Motors implement the ``has-position'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
-Sensors would implement the ``is-sensor'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''.
+Motors implement the ``\texttt{has-position}'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
+Sensors would implement the ``\texttt{is-sensor}'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''.
 Protocols which implement a trait must support all of the messages from the trait.
 Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
