@@ -63,14 +63,14 @@ This can involve utilization of many interfaces: NI DAQmx\cite{nidaqmx}, SCPI\ci
 The challenge of integrating all of these is a frustrating piece of the modern instrument development process.
 Weeks can be spent just integrating one new component into an existing project.
 In small academic labs, these software interfaces are typically created by student researchers without software development experience.
-Student researchers rarely focus on software reusability, and a lack of maitenence and documentation can make such software more difficult to use as time goes on.
+Student researchers rarely focus on software reusability, and a lack of maintenance and documentation can make such software more difficult to use as time goes on.
 Scientists may struggle to rapidly innovate on their experimental design when each hardware addition requires major software development.
 
 Some large user-facilities have addressed interface complexity via the adoption of unified standards, such as EPICS \cite{DalesioLR1991a} or TANGO \cite{AGotz1999TANGOA}.
 The unified standards define a network interface for any hardware component.
 Orchestration software can target these unified standards for reading and writing hardware state.
 Small background services are written to translate the myriad component interfaces into the standard EPICS IOCs and TANGO Devices.
-These programs are performant, open source, and have huge libraries of exisiting hardware interface support, but require expert management to set up and provide descriptions via a separate server program.
+These programs are performant, open source, and have huge libraries of existing hardware interface support, but require expert management to set up and provide descriptions via a separate server program.
 In our experience EPICS and TANGO do not scale well to single-investigator lab environments.
 
 As smaller research labs have grown in experimental complexity, many individual labs have created domain-specific orchestration software.
@@ -115,14 +115,14 @@ A graduate student finds themself needing to master advanced concepts in concurr
 \end{figure}
 
 Figure \ref{fig:network} diagrams the \yaq{} architecture.
-Here, we show three different computers connected via an ethernet network.
+Here, we show three different computers connected via an Ethernet network.
 The top and bottom computer are connected to monitors for interactive use while the middle computer is only accessible via the network.
 This might represent a complex scientific instrument involving several operator terminals as well as embedded computers.
 At the top, a single computer is connected to four hardware peripherals through RS232, TTL, USB, and PCI as indicated by the colored lines.
 That same computer is running four separate programs, one for each peripheral.
 These small, targeted, programs are managed by the operating system and run in the background.
 It is conventional to call such programs ``daemons''\cite{Raymond_1996}.
-The middle computer is connected two two additional peripherals, and runs daemons for each.
+The middle computer is connected to two additional peripherals, and runs daemons for each.
 Besides communicating with the hardware peripheral, each daemon can communicate with other programs, ``clients'',  through the network.
 The four client programs shown in Figure \ref{fig:network} can each communicate with all six hardware peripherals shown.
 As an example, a client running on the bottom computer could communicate with the RS232 peripheral shown in green via the following path: client $\leftrightarrow$ network switch $\leftrightarrow$ top computer $\leftrightarrow$ daemon $\leftrightarrow$ hardware peripheral.
@@ -135,7 +135,7 @@ Avro provides an agreed upon standard for efficient serialization of data and me
 Practically, the \yaq{} interface looks like a collection of methods or functions, which Avro calls ``messages''.
 Each message has defined input parameters and output return types.
 A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
-A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null} '' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
+A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
 These self describing messages make up the lowest level functionality of the \yaq{} interface.
 Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
@@ -194,11 +194,11 @@ Beyond this, clients can use traits to interact with similar hardware identicall
 A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figures/client_spectrum},
+\includegraphics[width=\columnwidth]{figures/client_spectrum}
 	\caption{  \label{fig:foundation} \yaq{} scales from simple scripts to integrations with featureful frameworks.}
 \end{figure}
 
-A \yaq{} client can scale in complexity from a small, lightweight script all the way to a complicated graphical program, as shown in Figure \ref{fig:foundation}.
+A \yaq{} client can scale in complexity from a small, lightweight script all the way to a sophisticated graphical program, as shown in Figure \ref{fig:foundation}.
 At the bottom, we represent the most lightweight interface to \yaq{}, Python scripting.
 \texttt{yaqc}\cite{yaqc} is a Python client which is excellent for using in scripts or any other Python program.
 The code shown creates three client objects which could be used directly through an interactive Python prompt or in a reusable script.
@@ -218,7 +218,7 @@ Similar translation layers could be built for a variety of orchestration layers 
 All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
 All types of clients can be used simultaneously to interact with the same instrument in different modes.
 Client sophistication can be introduced naturally, as novel experiments are tested and refined.
-Different clients can specialize for different requirements of a custom instrument
+Different clients can specialize for different requirements of a custom instrument.
 For example, \texttt{yaqc-qtpy} can provide a quick interface for setting and viewing hardware positions while Bluesky can focus on experimental data acquisition.
 
 The Landis Group at UW-Madison is currently working on a new type of flow reactor: the Wisconsin Quench Kinetics Reactor (WiQK).
@@ -235,7 +235,7 @@ The Wright Group at UW-Madison needs to orchestrate a large variety of hardware 
 This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
-Remote client development on viritual hardware has allowed client design to proceed without delaying ongling experiments.
+Remote client development on virtual hardware has allowed client design to proceed without delaying ongoing experiments.
 Clients developed by the Wright Group have proved flexible enough to be used on four laser systems, each with different complements of hardware.
 Moving forward, the Wright Group will spend less energy developing control software and more energy developing creative spectroscopy experiments.
 
