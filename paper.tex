@@ -136,7 +136,7 @@ Practically, the \yaq{} interface looks like a collection of methods or function
 Each message has defined input parameters and output return types.
 A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
 A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
-These self describing messages make up the lowest level functionality of the \yaq{} interface.
+These self-describing messages make up the lowest level functionality of the \yaq{} interface.
 Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
 
@@ -206,7 +206,7 @@ Each client object provides Python methods for each Avro message specified by th
 
 In the middle, the same three hardware peripherals are represented in an interactive, graphical form.
 \texttt{yaqc-qtpy}\cite{yaqc-qtpy} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
-The self describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
+The self-describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
 This is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
 
 At the top, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
@@ -255,7 +255,7 @@ Finally, as discussed in Section II, \yaq{} gives you options to design using re
 We have created several tools to aide in daemon development.
 First, a Python library, \texttt{yaqd-core}\cite{yaqd-core-python}, which implements shared functionality.
 Second, \texttt{yaq-traits}\cite{yaq-traits} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
-The format it generates is an important part of how \yaq{} protocols are self describing.
+The format it generates is an important part of how \yaq{} protocols are self-describing.
 This shields developers from the details of Apache Avro, which can be somewhat esoteric.
 
 \begin{figure}
