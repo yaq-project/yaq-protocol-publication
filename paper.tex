@@ -232,7 +232,7 @@ This approach ensures that the Landis Group is not slowed down by complex, infle
 Once the reactor is complete, more sophisticated graphical clients will be created to accommodate end users who were not involved as the reactor was built.
 
 The Wright Group at UW-Madison needs to orchestrate a large variety of hardware in multidimensional scans for their complex spectroscopy experiments \cite{MukamelShaul2000a, WrightJohnCurtis2011a}.
-This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a}.
+This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a, SundenKyle2022}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
 This allows Wright Group researchers to create polished client interfaces without interrupting  ongoing experiments.
@@ -271,11 +271,11 @@ Figure \ref{fig:histogram} shows the distribution of unique lines of Python code
 While lines of code is an imperfect metric, we use it here to represent the amount of work required to create a daemon for a new hardware peripheral.
 Most interfaces, such as Brooks MFC\cite{yaqd-brooks-mfc}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
-Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{}.
+Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{pyserial, pyusb, pyvisa, pymodbus}.
 In our experience, the process of creating a new daemon involves about a day of work after communication with the hardware using Python is well understood.
 There are currently 70 daemons in the yaq project supporting at least 50 kinds of hardware, noting that some daemons support the same hardware and others are software only.
 Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
-A living list of all daemons and supported hardware can be found on the \yaq{} website.\cite{}
+A living list of all daemons and supported hardware can be found on the \yaq{} website.\cite{yaq_fyi_daemons}
 
 The Stahl Group at UW-Madison created a custom reactor which monitors gasses being produced or consumed in the reaction head-space.  \cite{SalazarChaseA2021a}
 This reactor incorporates a collection of sensitive pressure transducers and a single heating process value under computer control.
@@ -291,7 +291,7 @@ Years after the original researchers leave, large monolithic acquisition program
 A graduate student discovers a hard-coded conversion factor that is incorrect years after implementation.
 Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface while newer, cheaper oscilloscopes are readily available.
 A graduate student is forced to meticulously reverse engineer the LabVIEW codebase that they inherited in order to understand the details of their experiment.
-Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{}
+Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{Allman_2012}
 Technical debt grows especially fast in academic environments where graduate students are involved in projects for a limited time.
 
 The \yaq{} approach favors many small single-purpose applications above large monolithic ones.
