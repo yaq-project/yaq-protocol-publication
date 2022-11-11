@@ -110,8 +110,8 @@ Custom orchestration software needs to be closed before the manufacturers config
 A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
 
 \begin{figure}
-	\includegraphics[width=\columnwidth]{figures/network}
-\caption{\label{fig:network} Networking diagram}
+    \includegraphics[width=\columnwidth]{figures/network}
+    \caption{\label{fig:network} Simplified network diagram for a hypothetical instrument. Three computers are connected via orange Ethernet cables and a network switch (middle right). Some of the computers are also connected to hardware peripherals via one of six interfaces (colored lines). For each interface, the computer runs a \yaq{} daemon (small colored squares). The top and bottom computers are also running \yaq{} client applications.}
 \end{figure}
 
 Figure \ref{fig:network} diagrams the \yaq{} architecture.
@@ -194,8 +194,8 @@ Beyond this, clients can use traits to interact with similar hardware identicall
 A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figures/client_spectrum}
-	\caption{  \label{fig:foundation} \yaq{} scales from simple scripts to integrations with featureful frameworks.}
+  \includegraphics[width=\columnwidth]{figures/client_spectrum}
+  \caption{\label{fig:foundation} Representations of three very different \yaq{} client experiences. Top: light-weight scripting. Middle: graphical user interface. Bottom: integration with Bluesky for data collection. In all three cases the same daemons are addressed.}
 \end{figure}
 
 A \yaq{} client can scale in complexity from a small, lightweight script all the way to a sophisticated graphical program, as shown in Figure \ref{fig:foundation}.
