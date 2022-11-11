@@ -78,7 +78,6 @@ In the last few years, several open source projects by-and-for small-scale exper
 While this growth is encouraging, many of these are limited by their focus on particular types of hardware or particular experimental domains.
 Most small custom research instrumentation continues to rely on monolithic software which has hard-coded interface support for each particular connected device.
 These monolithic applications tend to be inflexible and difficult to develop.
-%To our knowledge, there are no existing open source projects that attempt to define a unified standard for hardware control of small scale experiments.
 
 We have created a new network-based communication standard for scientific instrumentation, \yaq{}.
 This standard borrows the most important ideas from established projects used by large user facilities while retaining the simplicity appropriate for small research labs.
@@ -93,7 +92,7 @@ Finally, we discuss the heavy software maintenance burden that many instrument d
 In each case, we will highlight how the \yaq{} project is designed to alleviate that challenge.
 Several case studies provide a view into the flexible ways that \yaq{} can be applied to perform different scientific experiments.
 This paper provides an overview of the concepts and motivations behind \yaq{}.
-Refer to the \yaq{} website for a formal specification of the \yaq{} standard.\cite{yaq_fyi}
+Refer to the \yaq{} website for a formal specification of the \yaq{} standard.\footnote{The \yaq{} protocol is fully specified by the set of accepted \yaq{} Enhancement Proposals at https://yeps.yaq.fyi/}
 
 \section{Hardware Interface Challenges}
 
@@ -200,19 +199,19 @@ A client written to perform a two dimensional fluorescence experiment using two 
 
 A \yaq{} client can scale in complexity from a small, lightweight script all the way to a sophisticated graphical program, as shown in Figure \ref{fig:foundation}.
 At the bottom, we represent the most lightweight interface to \yaq{}, Python scripting.
-\texttt{yaqc}\cite{yaqc} is a Python client which is excellent for using in scripts or any other Python program.
+\texttt{yaqc}\footnote{\texttt{yaqc} available on PyPI at https://pypi.org/project/yaqc/} is a Python client which is excellent for using in scripts or any other Python program.
 The code shown creates three client objects which could be used directly through an interactive Python prompt or in a reusable script.
 Each client object provides Python methods for each Avro message specified by the associated protocol.
 
 In the middle, the same three hardware peripherals are represented in an interactive, graphical form.
-\texttt{yaqc-qtpy}\cite{yaqc-qtpy} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
+\texttt{yaqc-qtpy}\footnote{\texttt{yaqc-qtpy} available on PyPI at https://pypi.org/project/yaqc-qtpy/} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
 The self-describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
 This is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
 
 At the top, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
 Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data.
-\texttt{yaqc-bluesky}\cite{yaqc-bluesky} provides a bridge to the Bluesky ecosystem.
+\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} provides a bridge to the Bluesky ecosystem.
 Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
 
 All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
@@ -253,8 +252,8 @@ Tooling exists to verify full trait compliance, for example you can use \texttt{
 Finally, as discussed in Section II, \yaq{} gives you options to design using remote hardware or unusual interfaces when necessary.
 
 We have created several tools to aide in daemon development.
-First, a Python library, \texttt{yaqd-core}\cite{yaqd-core-python}, which implements shared functionality.
-Second, \texttt{yaq-traits}\cite{yaq-traits} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
+First, a Python library, \texttt{yaqd-core}\footnote{\texttt{yaqd-core-python} available on PyPI at https://pypi.org/project/yaqd-core}, which implements shared functionality.
+Second, \texttt{yaq-traits}\footnote{\texttt{yaq-traits} available on PyPI at https://pypi.org/project/yaq-traits} is a command line application which allows the description of messages provided by a \yaq{} protocol to be written in a human-readable fashion and translated into a more fully described machine readable format.
 The format it generates is an important part of how \yaq{} protocols are self-describing.
 This shields developers from the details of Apache Avro, which can be somewhat esoteric.
 
@@ -263,19 +262,19 @@ This shields developers from the details of Apache Avro, which can be somewhat e
 	\caption{  \label{fig:histogram} Histogram of the number of lines for each implemented daemon.
 	Some daemons are implemented in ways that share code, resulting in apparent line counts less than 10.
 	For example, the Thorlabs APT\cite{thorlabs_apt} motor implementation supports at least eight different daemons with each specifying only a handful of constants.
-	These are extreme examples which are not representative of most hardware interfaces, so we omit them here. % it's not clear to me why these instances are not included (and scaled down???) It is a _feature_ not a bug that one can implement motor support with tiny amounts of code.
+	These are extreme examples which are not representative of most hardware interfaces, so we omit them here.
 	}
 \end{figure}
 
 Figure \ref{fig:histogram} shows the distribution of unique lines of Python code written to implement each of the daemons in our current ecosystem.
 While lines of code is an imperfect metric, we use it here to represent the amount of work required to create a daemon for a new hardware peripheral.
-Most interfaces, such as Brooks MFC\cite{yaqd-brooks-mfc}, have been implemented in fewer than 100 lines of Python code.
+Most interfaces, such as Brooks MFC\footnote{\texttt{yaqd-brooks-mfc-gf} source code available on GitHub at \texttt{https://github.com/yaq-project/yaqd-brooks/}}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
 Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{pyserial, pyusb, pyvisa, pymodbus}.
 In our experience, the process of creating a new daemon involves about a day of work after communication with the hardware using Python is well understood.
 There are currently 70 daemons in the yaq project supporting at least 50 kinds of hardware, noting that some daemons support the same hardware and others are software only.
 Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
-A living list of all daemons and supported hardware can be found on the \yaq{} website.\cite{yaq_fyi_daemons}
+A living list of all daemons and supported hardware can be found on the \yaq{} website.\footnote{See https://yaq.fyi/daemons/ and https://yaq.fyi/hardware/ for living lists of all \yaq{} daemons and supported hardware, respectively.}
 
 The Stahl Group at UW-Madison created a custom reactor which monitors gasses being produced or consumed in the reaction head-space.  \cite{SalazarChaseA2021a}
 This reactor incorporates a collection of sensitive pressure transducers and a single heating process value under computer control.
@@ -298,7 +297,7 @@ The \yaq{} approach favors many small single-purpose applications above large mo
 For daemons, the purpose of each application is obvious and unambiguous.
 There is a strict, well defined interface which explicitly limits the kinds of interactions that are provided to the hardware, thus limiting opportunity for unintended consequences.
 The lack of hardware interface code makes \yaq{} clients much simpler and easier to describe and maintain.
-Tools like \texttt{yaqd-fakes}\cite{yaqd-fakes} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing.
+Tools like \texttt{yaqd-fakes}\footnote{\texttt{yaqd-fakes} available on PyPI at https://pypi.org/project/yaqd-fakes/} allow clients to be tested and improved outside of their instrument, including the possibility of fully automated testing.
 Simple, script-based clients written using the expressiveness of Python can be read and understood in hours rather than weeks.
 Integrations with communities like Bluesky offer powerful features which are actively maintained across many institutions.
 
