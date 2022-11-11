@@ -41,11 +41,10 @@
 
 Modern instrumentation development often involves incorporation of many dissimilar hardware peripherals into a single unified instrument.
 Increasing availability of modular hardware has brought greater instrument complexity to small research groups.
-%The flexibility promised to instrument makers by large hardware availability stretches the capability of traditional, monolithic orchestration software.
 This complexity stretches the capability of traditional, monolithic orchestration software.
 In many cases, a lack of software flexibility leads creative researchers to feel frustrated, unable to perform experiments they envision.
 Herein we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
-\yaq{} encourages a highly modular approach to experimental software development, which is well suited to address the experimental flexibility needs of complex instruments.
+\yaq{} encourages a highly modular approach to experimental software development which is well suited to address the experimental flexibility needs of complex instruments.
 \yaq{} is designed to overcome hardware communication barriers that are insurmountable with typical experimental software.
 A large number of hardware peripherals are already supported, with tooling available to expand support.
 The \yaq{} standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
@@ -84,7 +83,7 @@ This standard borrows the most important ideas from established projects used by
 We have built this standard to be self-describing, portable, and reusable wherever possible.
 Our primary goal has been to make an interface which simplifies orchestration software development as much as possible.
 
-Here, we discuss the design of the \yaq{} standard in the context of four challenges facing instrument designers.
+Here, we discuss the design of the \yaq{} standard in the context of challenges facing instrument designers.
 First, we discuss how particularly challenging hardware interfaces can become seemingly insurmountable barriers to software control.
 Next, we discuss how inflexible orchestration software can limit experimental creativity.
 Then, we focus on challenges that arise when enhancing or modifying existing instruments with new hardware.
@@ -288,7 +287,7 @@ This new digitizer will be incorporated into the existing reactor without modify
 
 Years after the original researchers leave, large monolithic acquisition programs become unknowable, undocumented, and unmaintained.
 A graduate student discovers a hard-coded conversion factor that is incorrect years after implementation.
-Scientists resort to sourcing a replacement for an old, broken oscilloscope due to their reliance of their software on that particular interface while newer, cheaper oscilloscopes are readily available.
+Scientists resort to sourcing an exact replacement for an old, broken oscilloscope due to their software's reliance on that particular interface---newer, cheaper oscilloscopes are readily available.
 A graduate student is forced to meticulously reverse engineer the LabVIEW codebase that they inherited in order to understand the details of their experiment.
 Software developers refer to the extra effort required to modify or fix large unmaintained codebases as ``technical debt''.\cite{Allman_2012}
 Technical debt grows especially fast in academic environments where graduate students are involved in projects for a limited time.
@@ -306,11 +305,15 @@ For example, two different instruments might happen to use the same temperature 
 Because the temperature sensor daemon is its own independent program, both instruments can benefit from the same daemon.
 The growing ``ecosystem'' of \yaq{} daemons make future instruments easier and easier to develop.
 Growing this ecosystem is a collaborative effort where many \yaq{} users create portable daemons that they need and share them with the community where they will be used and improved.
+\yaq{} components can be incorporated seamlessly into existing software projects, including languages other than Python.
+For example, an existing LabVIEW project may add additional hardware support via \yaq{}.
+In this way, a more modular instrument can be built gradually without needing to overhaul all of the software simultaneously.
 
 Software documentation is famously difficult and thankless work.
 \yaq{} attempts to automate daemon documentation as much as possible.
 Our website, https://yaq.fyi, automatically builds generated reference pages for all known protocols.
 These pages are automatically updated when new versions are published.
+Our website also contains written and video tutorials on \yaq{} usage and development.
 
 \yaq{} is open source software.
 Anyone can view, install, edit, and suggest changes to our growing collection of daemons and clients.
