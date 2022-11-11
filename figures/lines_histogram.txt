@@ -1,66 +1,66 @@
-file	lines	code	comments	blanks	type
-yaqd-acton/yaqd_acton/_acton_2150i.py	65	48	3	14	stub
-yaqd-acton/yaqd_acton/_acton_sp2300i.py	15	10	0	5	stub
-yaqd-acton/yaqd_acton/_actonmono.py	334	291	7	36	protocol
-yaqd-adafruit/yaqd_adafruit/_adafruit_stepper_motor_hat.py	99	76	5	18	normal
-yaqd-andor/yaqd_andor/_andor_neo.py	111	89	4	18	stub
-yaqd-andor/yaqd_andor/_andor_sdk3.py	179	147	5	27	protocol
-yaqd-andor/yaqd_andor/_andor_simcam.py	78	59	4	15	stub
-yaqd-andor/yaqd_andor/_andor_sona.py	91	74	3	14	normal
-yaqd-attune/yaqd_attune/_attune.py	153	127	0	26	normal
-yaqd-attune/yaqd_attune/_attune_delay.py	150	120	1	29	normal
+file	lines	code	comments	blanks	type	class
+yaqd-acton/yaqd_acton/_acton_2150i.py	65	48	3	14	stub	has-position
+yaqd-acton/yaqd_acton/_acton_sp2300i.py	15	10	0	5	stub	has-position
+yaqd-acton/yaqd_acton/_actonmono.py	334	291	7	36	protocol	has-position
+yaqd-adafruit/yaqd_adafruit/_adafruit_stepper_motor_hat.py	99	76	5	18	normal	has-position
+yaqd-andor/yaqd_andor/_andor_neo.py	111	89	4	18	stub	is-sensor
+yaqd-andor/yaqd_andor/_andor_sdk3.py	179	147	5	27	protocol	is-sensor
+yaqd-andor/yaqd_andor/_andor_simcam.py	78	59	4	15	stub	is-sensor
+yaqd-andor/yaqd_andor/_andor_sona.py	91	74	3	14	normal	is-sensor
+yaqd-attune/yaqd_attune/_attune.py	153	127	0	26	normal	has-position
+yaqd-attune/yaqd_attune/_attune_delay.py	150	120	1	29	normal	has-position
 yaqd-becker-hickl/yaqd_becker_hickl/_becker_hickl_spc130.py	26	13	7	6	normal
-yaqd-brooks/yaqd_brooks/_brooks_mfc_gf.py	96	74	6	16	normal
-yaqd-brooks/yaqd_brooks/_dispatcher.py	52	43	0	9	serial
-yaqd-chemyx/yaqd_chemyx/_chemyx_fusion.py	54	38	3	13	normal
-yaqd-dwyer/yaqd_dwyer/_dwyer_16b.py	104	81	7	16	normal
-yaqd-dwyer/yaqd_dwyer/_dwyer_16c.py	67	50	4	13	normal
+yaqd-brooks/yaqd_brooks/_brooks_mfc_gf.py	96	74	6	16	normal	has-position
+yaqd-brooks/yaqd_brooks/_dispatcher.py	52	43	0	9	serial	serial
+yaqd-chemyx/yaqd_chemyx/_chemyx_fusion.py	54	38	3	13	normal	has-position
+yaqd-dwyer/yaqd_dwyer/_dwyer_16b.py	104	81	7	16	normal	has-position
+yaqd-dwyer/yaqd_dwyer/_dwyer_16c.py	67	50	4	13	normal	has-position
 yaqd-edaq/yaqd_edaq/_edaq_isopod.py	53	44	0	9	normal
-yaqd-ekspla/yaqd_ekspla/_ekspla_nt340.py	77	63	0	14	normal
-yaqd-firmata/yaqd_firmata/_arduino_gpio.py	77	54	9	14	normal
-yaqd-gage/yaqd_gage/_chopping.py	240	198	15	27	normal
-yaqd-gage/yaqd_gage/_compuscope.py	154	124	14	16	normal
-yaqd-gdrive/yaqd_gdrive/_gdrive.py	346	305	4	37	normal
-yaqd-horiba/yaqd_horiba/_horiba_ihr.py	155	126	3	26	stub
-yaqd-horiba/yaqd_horiba/_horiba_mono.py	140	107	9	24	protocol
-yaqd-lightcon/yaqd_lightcon/_lightcon_topas4_motor.py	71	58	0	13	normal
-yaqd-lightcon/yaqd_lightcon/_lightcon_topas4_shutter.py	41	35	0	6	normal
-yaqd-mcc/yaqd_mcc/_mcc_118.py	24	17	0	7	normal
-yaqd-mcc/yaqd_mcc/_mcc_152_aout.py	40	28	2	10	normal
-yaqd-microchip/yaqd_microchip/_mcp3428.py	80	58	7	15	normal
-yaqd-microchip/yaqd_microchip/_mcp9600.py	51	33	10	8	normal
-yaqd-mqtt/yaqd_mqtt/_mqtt_homie_sensor.py	132	108	7	17	normal
-yaqd-new-era/yaqd_new_era/_new_era_continuous_nextgen.py	107	89	2	16	normal
-yaqd-new-era/yaqd_new_era/_new_era_ne1000.py	152	122	12	18	normal
-yaqd-newport/yaqd_newport/_newport_motor.py	201	168	12	21	protocol
-yaqd-newport/yaqd_newport/_serial.py	51	42	0	9	serial
-yaqd-ni/yaqd_ni/_ni_daqmx_tmux.py	357	293	39	25	normal
-yaqd-omega/yaqd_omega/_omega_platinum.py	59	45	5	9	normal
-yaqd-pi/yaqd_pi/_pi_proem.py	108	63	25	20	normal
-yaqd-picotech/yaqd_picotech/_picotech_adc_triggered.py	340	271	22	47	normal
-yaqd-pmc/yaqd_pmc/_pmc.py	110	93	0	17	normal
-yaqd-rgb/yaqd_rgb/_rgb_qmini.py	50	38	0	12	normal
-yaqd-rpi-gpio/yaqd_rpi_gpio/_gpio_digital_output.py	37	27	0	10	normal
-yaqd-rpi-gpio/yaqd_rpi_gpio/_gpio_digital_sensor.py	31	23	0	8	normal
-yaqd-scpi/yaqd_scpi/_scpi_sensor.py	31	24	0	7	normal
-yaqd-scpi/yaqd_scpi/_scpi_set_continuous.py	36	28	0	8	normal
-yaqd-scpi/yaqd_scpi/_scpi_set_discrete.py	40	32	0	8	normal
-yaqd-seabreeze/yaqd_seabreeze/_seabreeze.py	53	39	0	14	normal
-yaqd-seek/yaqd_seek/_seek_compact.py	202	163	17	22	normal
-|d-spectra-physics/yaqd_spectra_physics/_spectra_physics_millennia.py	133	113	7	13	normal
-yaqd-system-monitor/yaqd_system_monitor/_system_monitor.py	40	31	0	9	normal
-yaqd-thorlabs/yaqd_thorlabs/_serial.py	81	66	0	15	serial
-yaqd-thorlabs/yaqd_thorlabs/_thorlabs_apt_motor.py	128	106	4	18	protocol
-yaqd-thorlabs/yaqd_thorlabs/_thorlabs_ellx.py	113	95	1	17	protocol
-yaqd-thorlabs/yaqd_thorlabs/_thorlabs_mpc320.py	28	22	0	6	stub
-yaqd-thorlabs/yaqd_thorlabs/_thorlabs_pax1000.py	89	74	3	12	normal
-yaqd-thorlabs/yaqd_thorlabs/_thorlabs_pm_triggered.py	161	138	5	18	normal
-yaqd-ti/yaqd_ti/_ads1115.py	91	73	9	9	normal
-yaqd-vici/yaqd_vici/_vici_two_position.py	70	58	3	9	normal
-yaqd-wright/yaqd_wright/_ndinterp.py	134	103	1	30	normal
-yaqd-wright/yaqd_wright/_wright_aerotech.py	49	33	5	11	normal
-yaqd-wright/yaqd_wright/_wright_ingaas.py	108	86	8	14	normal
-yaqd-wright/yaqd_wright/_wright_stepper_box.py	76	65	0	11	normal
-yaqd-wright/yaqd_wright/_wright_wl_motor.py	29	15	7	7	normal
-yaqd-zaber/yaqd_zaber/_serial.py	65	55	0	10	serial
-yaqd-zaber/yaqd_zaber/_zaber_binary.py	106	88	5	13	normal
+yaqd-ekspla/yaqd_ekspla/_ekspla_nt340.py	77	63	0	14	normal	has-position
+yaqd-firmata/yaqd_firmata/_arduino_gpio.py	77	54	9	14	normal	has-position
+yaqd-gage/yaqd_gage/_chopping.py	240	198	15	27	normal	is-sensor
+yaqd-gage/yaqd_gage/_compuscope.py	154	124	14	16	normal	is-sensor
+yaqd-gdrive/yaqd_gdrive/_gdrive.py	346	305	4	37	normal	other
+yaqd-horiba/yaqd_horiba/_horiba_ihr.py	155	126	3	26	stub	has-position
+yaqd-horiba/yaqd_horiba/_horiba_mono.py	140	107	9	24	protocol	has-position
+yaqd-lightcon/yaqd_lightcon/_lightcon_topas4_motor.py	71	58	0	13	normal	has-position
+yaqd-lightcon/yaqd_lightcon/_lightcon_topas4_shutter.py	41	35	0	6	normal	has-position
+yaqd-mcc/yaqd_mcc/_mcc_118.py	24	17	0	7	normal	is-sensor
+yaqd-mcc/yaqd_mcc/_mcc_152_aout.py	40	28	2	10	normal	has-position
+yaqd-microchip/yaqd_microchip/_mcp3428.py	80	58	7	15	normal	is-sensor
+yaqd-microchip/yaqd_microchip/_mcp9600.py	51	33	10	8	normal	is-sensor
+yaqd-mqtt/yaqd_mqtt/_mqtt_homie_sensor.py	132	108	7	17	normal	is-sensor
+yaqd-new-era/yaqd_new_era/_new_era_continuous_nextgen.py	107	89	2	16	normal	has-position
+yaqd-new-era/yaqd_new_era/_new_era_ne1000.py	152	122	12	18	normal	has-position
+yaqd-newport/yaqd_newport/_newport_motor.py	201	168	12	21	protocol	has-position
+yaqd-newport/yaqd_newport/_serial.py	51	42	0	9	serial	serial
+yaqd-ni/yaqd_ni/_ni_daqmx_tmux.py	357	293	39	25	normal	is-sensor
+yaqd-omega/yaqd_omega/_omega_platinum.py	59	45	5	9	normal	is-sensor
+yaqd-pi/yaqd_pi/_pi_proem.py	108	63	25	20	normal	is-sensor
+yaqd-picotech/yaqd_picotech/_picotech_adc_triggered.py	340	271	22	47	normal	is-sensor
+yaqd-pmc/yaqd_pmc/_pmc.py	110	93	0	17	normal	has-position
+yaqd-rgb/yaqd_rgb/_rgb_qmini.py	50	38	0	12	normal	is-sensor
+yaqd-rpi-gpio/yaqd_rpi_gpio/_gpio_digital_output.py	37	27	0	10	normal	has-position
+yaqd-rpi-gpio/yaqd_rpi_gpio/_gpio_digital_sensor.py	31	23	0	8	normal	is-sensor
+yaqd-scpi/yaqd_scpi/_scpi_sensor.py	31	24	0	7	normal	is-sensor
+yaqd-scpi/yaqd_scpi/_scpi_set_continuous.py	36	28	0	8	normal	has-position
+yaqd-scpi/yaqd_scpi/_scpi_set_discrete.py	40	32	0	8	normal	has-position
+yaqd-seabreeze/yaqd_seabreeze/_seabreeze.py	53	39	0	14	normal	is-sensor
+yaqd-seek/yaqd_seek/_seek_compact.py	202	163	17	22	normal	is-sensor
+|d-spectra-physics/yaqd_spectra_physics/_spectra_physics_millennia.py	133	113	7	13	normal	has-position
+yaqd-system-monitor/yaqd_system_monitor/_system_monitor.py	40	31	0	9	normal	is-sensor
+yaqd-thorlabs/yaqd_thorlabs/_serial.py	81	66	0	15	serial	serial
+yaqd-thorlabs/yaqd_thorlabs/_thorlabs_apt_motor.py	128	106	4	18	protocol	has-position
+yaqd-thorlabs/yaqd_thorlabs/_thorlabs_ellx.py	113	95	1	17	protocol	has-position
+yaqd-thorlabs/yaqd_thorlabs/_thorlabs_mpc320.py	28	22	0	6	stub	has-position
+yaqd-thorlabs/yaqd_thorlabs/_thorlabs_pax1000.py	89	74	3	12	normal	has-position
+yaqd-thorlabs/yaqd_thorlabs/_thorlabs_pm_triggered.py	161	138	5	18	normal	is-sensor
+yaqd-ti/yaqd_ti/_ads1115.py	91	73	9	9	normal	is-sensor
+yaqd-vici/yaqd_vici/_vici_two_position.py	70	58	3	9	normal	has-position
+yaqd-wright/yaqd_wright/_ndinterp.py	134	103	1	30	normal	has-position
+yaqd-wright/yaqd_wright/_wright_aerotech.py	49	33	5	11	normal	has-position
+yaqd-wright/yaqd_wright/_wright_ingaas.py	108	86	8	14	normal	is-sensor
+yaqd-wright/yaqd_wright/_wright_stepper_box.py	76	65	0	11	normal	has-position
+yaqd-wright/yaqd_wright/_wright_wl_motor.py	29	15	7	7	normal	has-position
+yaqd-zaber/yaqd_zaber/_serial.py	65	55	0	10	serial	serial
+yaqd-zaber/yaqd_zaber/_zaber_binary.py	106	88	5	13	normal	has-position
