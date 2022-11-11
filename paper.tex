@@ -134,9 +134,11 @@ Practically, the \yaq{} interface looks like a collection of methods or function
 Each message has defined input parameters and output return types.
 A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
 A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
-These self-describing messages make up the lowest level functionality of the \yaq{} interface.
+Messages make up the lowest level functionality of the \yaq{} interface.
 Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
+When a client first connects to a daemon over TCP/IP, the daemon provides a complete description of its own protocol.
+We therefore refer to the daemons as ``self-describing''.
 
 \yaq{} introduces a concept called ``Traits'' which are collections of related messages that are shared among multiple protocols.
 Motors implement the ``\texttt{has-position}'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
@@ -196,8 +198,8 @@ A client written to perform a two dimensional fluorescence experiment using two 
   \caption{\label{fig:foundation} Representations of three very different \yaq{} client experiences. Top: light-weight scripting. Middle: graphical user interface. Bottom: integration with Bluesky for data collection. In all three cases the same daemons are addressed.}
 \end{figure}
 
-A \yaq{} client can scale in complexity from a small, lightweight script all the way to a sophisticated graphical program, as shown in Figure \ref{fig:foundation}.
-At the bottom, we represent the most lightweight interface to \yaq{}, Python scripting.
+Figure \ref{fig:foundation} shows that \yaq{} supports a diverse array of client types.
+At the top, we represent the most lightweight interface to \yaq{}, Python scripting.
 \texttt{yaqc}\footnote{\texttt{yaqc} available on PyPI at https://pypi.org/project/yaqc/} is a Python client which is excellent for using in scripts or any other Python program.
 The code shown creates three client objects which could be used directly through an interactive Python prompt or in a reusable script.
 Each client object provides Python methods for each Avro message specified by the associated protocol.
@@ -207,7 +209,7 @@ In the middle, the same three hardware peripherals are represented in an interac
 The self-describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
 This is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
 
-At the top, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
+At the bottom, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
 Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data.
 \texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} provides a bridge to the Bluesky ecosystem.
