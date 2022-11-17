@@ -58,7 +58,7 @@ The \yaq{} standard enables collaboration among multiple research groups, increa
 Instrumentation development is a key part of the scientific enterprise.
 Novel instruments are typically constructed of many individual components that are both purchased and home-built.
 Orchestration software must communicate with each hardware component in the course of a scientific experiment.
-This can involve utilization of many interfaces: NI DAQmx\cite{nidaqmx}, SCPI\cite{scpi}, ModBus\cite{modbus}, PICam\cite{picam}, Thorlabs APT\cite{thorlabs_apt}, among many others.
+Orchestration can involve utilization of many interfaces: NI DAQmx\cite{nidaqmx}, SCPI\cite{scpi}, ModBus\cite{modbus}, PICam\cite{picam}, Thorlabs APT\cite{thorlabs_apt}, among many others.
 The challenge of integrating all of these interfaces is a frustrating piece of the modern instrument development process.
 Weeks can be spent just integrating one new component into an existing project.
 In small academic labs, these software interfaces are typically created by student researchers without software development experience.
@@ -114,8 +114,8 @@ A graduate student finds themself needing to master advanced concepts in concurr
 
 Figure \ref{fig:network} diagrams the \yaq{} architecture.
 Here, we show three different computers connected via an Ethernet network.
-The top and bottom computer are connected to monitors for interactive use while the middle computer is only accessible via the network.
-This might represent a complex scientific instrument involving several operator terminals as well as embedded computers.
+The top and bottom computer are connected to monitors for interactive use while the middle computer is only accessible via the networks.
+This diagram might represent a complex scientific instrument involving several operator terminals as well as embedded computers.
 At the top, a single computer is connected to four hardware peripherals through RS232, TTL, USB, and PCI as indicated by the colored lines.
 That same computer is running four separate programs, one for each peripheral.
 These small, targeted, programs are managed by the operating system and run in the background.
@@ -207,7 +207,7 @@ Each client object provides Python methods for each Avro message specified by th
 In the middle, the same three hardware peripherals are represented in an interactive, graphical form.
 \texttt{yaqc-qtpy}\footnote{\texttt{yaqc-qtpy} available on PyPI at https://pypi.org/project/yaqc-qtpy/} is a graphical application which builds interactive controls based on traits for any conceivable \yaq{} protocol.
 The self-describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
-This is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
+\texttt{yaqc-qtpy} is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
 
 At the bottom, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
@@ -235,7 +235,7 @@ The Wright Group at UW-Madison needs to orchestrate a large variety of hardware 
 This need for exquisite hardware control has resulted in several prior attempts at ``home-built'' orchestration software \cite{CarlsonRogerJohn1988a, MeyerKentAlbert2004b, KainSchuyler2017a, ThompsonBlaiseJonathan2018a, SundenKyle2022}.
 Now, using \yaq{}, the Wright Group has been able to move to Bluesky rather than inventing their own sophisticated control software ``from scratch''.
 The Wright Group uses simulated hardware to enable client development away from the active laboratory computers.
-This allows Wright Group researchers to create polished client interfaces without interrupting  ongoing experiments.
+Hardware simulation allows Wright Group researchers to create polished client interfaces without interrupting  ongoing experiments.
 Clients developed by the Wright Group have proved flexible enough to be used on four laser systems, each with different complements of hardware.
 Moving forward, the Wright Group will spend less energy developing control software and more energy developing creative spectroscopy experiments.
 
@@ -245,8 +245,8 @@ In a \yaq{} context, new hardware can be incorporated into an instrument through
 The \yaq{} architecture simplifies hardware interface development in several ways.
 First, because daemons are separate and portable programs, the development effort can be spread across the community of \yaq{} users.
 Often, researchers can download an existing daemon rather than writing a new one.
-Second, \yaq{} daemon development can be performed separated from the particulars of any individual client.
-Often, this means that initial hardware enablement work can be done on a researchers personal machine before the new hardware peripheral is installed in the instrument.
+Second, \yaq{} daemon development can be performed separately from the particulars of any individual client.
+Often, this separation allows initial hardware enablement work to be done on a researchers personal machine before the new hardware peripheral is installed in the instrument.
 Third, when developing trait-compliant protocols, it becomes easy to design and fully test your hardware interface.
 Traits are unambiguous and well-described, making an obvious target for development.
 Tooling exists to verify full trait compliance, for example you can use \texttt{yaqc-qtpy} to provide a graphical program to interact with your hardware immediately.
@@ -272,7 +272,7 @@ While lines of code is an imperfect metric, we use it here to represent the amou
 Most interfaces, such as Brooks MFC\footnote{\texttt{yaqd-brooks-mfc-gf} source code available on GitHub at \texttt{https://github.com/yaq-project/yaqd-brooks/}}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
 Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{pyserial, pyusb, pyvisa, pymodbus}.
-In our experience, the process of creating a new daemon involves about a day of work after communication with the hardware using Python is well understood.
+In our experience, the process of creating a new daemon involves about a day of work after mastering communication with the hardware.
 There are currently 72 daemons in the yaq project supporting at least 66 types of hardware, noting that some daemons support the same hardware and others are software only.
 Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
 A living list of all daemons and supported hardware can be found on the \yaq{} website.\footnote{See https://yaq.fyi/daemons/ and https://yaq.fyi/hardware/ for living lists of all \yaq{} daemons and supported hardware, respectively.}
@@ -323,7 +323,7 @@ Furthermore, anyone can create their own totally-custom client or daemon softwar
 Thirteen individuals have contributed code to the development of \yaq{}.
 Open-source development can be a powerful approach for research communities looking to share software-development and maintenance burdens. \cite{CohenJeremy2021a}
 It is our hope that a vibrant open-source community will form around \yaq{}.
-While open-source development is not a panacea \cite{NowogrodzkiAnna2019a}, we hope that by maintaining a distributed development strategy with a strict focus on only hardware interfaces the \yaq{} project might prove sustainable.
+While open-source development is not a panacea \cite{NowogrodzkiAnna2019a}, we hope that by maintaining a distributed development strategy with a strict focus on only hardware interfaces, the \yaq{} project might prove sustainable.
 
 \section{Conclusion}
 
