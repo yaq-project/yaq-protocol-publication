@@ -5,3 +5,7 @@
 *.bbl
 *.blg
 paperNotes.bib
+*.out
+*.xml
+*blx.bib
+*.toc
