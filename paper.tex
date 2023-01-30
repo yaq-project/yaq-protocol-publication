@@ -47,7 +47,7 @@ This complexity stretches the capability of traditional, monolithic orchestratio
 In many cases, a lack of software flexibility leads creative researchers to feel frustrated, unable to perform experiments they envision.
 Herein we describe \yaq{}, a software project defining a new standardized way of communicating with diverse hardware peripherals.
 \yaq{} encourages a highly modular approach to experimental software development which is well suited to address the experimental flexibility needs of complex instruments.
-\yaq{} is designed to overcome hardware communication barriers that are insurmountable with typical experimental software.
+\yaq{} is designed to overcome hardware communication barriers that challenge typical experimental software.
 A large number of hardware peripherals are already supported, with tooling available to expand support.
 The \yaq{} standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
 
@@ -274,7 +274,7 @@ Figure \ref{fig:histogram} shows the distribution of unique lines of Python code
 While lines of code is an imperfect metric, we use it here to represent the amount of work required to create a daemon for a new hardware peripheral.
 Most interfaces, such as Brooks MFC\footnote{\texttt{yaqd-brooks-mfc-gf} source code available on GitHub at \texttt{https://github.com/yaq-project/yaqd-brooks/}}, have been implemented in fewer than 100 lines of Python code.
 Even the most complicated daemons are implemented in about 300 lines.
-Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface tooling libraries that Python now provides\cite{pyserial, pyusb, pyvisa, pymodbus}.
+Implementing \yaq{} daemons using Python is enabled through our own tooling mentioned above and the large and growing ecosystem of hardware interface libraries that Python now provides\cite{pyserial, pyusb, pyvisa, pymodbus}.
 In our experience, the process of creating a new daemon involves about a day of work after mastering communication with the hardware.
 There are currently 72 daemons in the yaq project supporting at least 66 types of hardware, noting that some daemons support the same hardware and others are software only.
 Because \yaq{} is standards based, anyone can design and publish new daemons extending our hardware support.
@@ -314,7 +314,7 @@ Growing this ecosystem is a collaborative effort where many \yaq{} users create 
 For example, an existing LabVIEW project may provide additional hardware support via \yaq{}.
 In this way, a more modular instrument can be built gradually without needing to overhaul all of the software simultaneously.
 
-Software documentation is famously difficult and thankless work.
+Open source software built by scientists often has incomplete and inadequate documentation.
 \yaq{} attempts to automate daemon documentation as much as possible.
 Our website, https://yaq.fyi, automatically builds generated reference pages for all known protocols.
 These pages are automatically updated when new versions are published.
