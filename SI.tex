@@ -86,6 +86,22 @@
 \tableofcontents
 \renewcommand{\baselinestretch}{1.0}\normalsize
 
+
+
+
+Each message call over the yaq interface returns rapidly,
+ensuring that client applications are not blocked. Some mes-
+sages initiate long-running operations, e.g. motor motion and
+sensor measurement. Separate messages are provided to re-
+trieve results from e.g. sensor measurement. In order to know
+how long to wait, all yaq daemons provide a message called
+“is\_busy”, which returns "true" while the long running action
+is not complete, and "false" once it is finished. Additionally,
+multiple clients can communicate with the same daemon si-
+multaneously. A complex instrument may involve multiple
+operators watching sensor data in real time, while one pro-
+gram is orchestrating the hardware and recording the data.
+
 \section{Package size analysis}
 
 
