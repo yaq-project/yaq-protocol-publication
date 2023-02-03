@@ -160,16 +160,12 @@ The Raspberry Pi which drives several stepper motors can be placed onto a privat
 Because each \yaq{} daemon is running in its own process, the software environment can be tailored to its needs.
 A client running up-to-date Python 3.11 communicates seamlessly with a daemon running Python 3.7.
 
-The third hardware interface barrier: Some hardware interfaces are blocking.
-Monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become both critical and elusive errors.
-In \yaq{}, each daemon is only responsible for a single hardware interface.
-%Each \yaq{} daemon runs as a separate process (possibly not even on the same machine) and thus many of the hard concurrency problems with communicating with hardware are mitigated.
-It is expected that each message call over the \yaq{} interface will return rapidly, ensuring that client applications are not blocked for extended periods of time.
-This principle applies even when the message starts an action that might take several seconds to complete, such as homing a motor or initiating a measurement for a sensor.
-In these instances, the initial message simply starts the action and returns, with a separate message provided to retrieve results when they exist.
-In order to know how long to wait, the ``is-daemon`` trait provides a message called ``is\_busy'', which returns "true" while the long running action is not complete, and "false" once it is finished.
-Additionally, multiple clients can communicate with the same daemon simultaneously.
-A complex instrument may involve multiple operators watching sensor data in real time, while one program is orchestrating the hardware and recording the data.
+The third hardware interface barrier: Some hardware interfaces are blocking or slow.
+Experimental orchestration often means doing several things at once, \textit{e.g.} simultaneously moving several motors.
+To accomplish this task performantly, monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become both critical and elusive errors.
+When writing orchestration software using \yaq{}, slow hardware interfaces are replaced by fast Avro-RPC.
+In our experience, the \yaq{} interface is responsive enough to give good performace when orchestrating tens of motors using a singly-threaded client.
+There is a longer discussion of timing and order-of-operations control details using \yaq{} in the Supplementary Material.
 
 \section{Experimental Flexibility}
 
