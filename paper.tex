@@ -148,6 +148,7 @@ Sensors would implement the ``\texttt{is-sensor}'' trait which defines ``\texttt
 Protocols which implement a trait must support all of the messages from the trait.
 Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
+We now describe how the \yaq{} architecture addresses the three hardware interface barriers described at the beginning of this section.
 The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings
 \yaq{} provides a unified TCP/IP interface to all hardware peripherals based on the well-described Avro RPC protocol.
 The trait system was introduced in pursuit of our primary goal of easing the client development process.
