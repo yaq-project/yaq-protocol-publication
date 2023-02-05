@@ -28,5 +28,5 @@ for pt in data.itertuples():
             arrowprops=dict(arrowstyle="->"),
         )
 
-plt.show()
-#fig.savefig("scaling.png", dpi=300)
+#plt.show()
+fig.savefig("scaling.png", dpi=300)
