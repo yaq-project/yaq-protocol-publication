@@ -146,7 +146,16 @@ We therefore refer to the daemons as ``self-describing''.
 Motors implement the ``\texttt{has-position}'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
 Sensors would implement the ``\texttt{is-sensor}'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''.
 Protocols which implement a trait must support all of the messages from the trait.
+Traits are compositional: a given protocol may implement several traits at once.
+For example, a protocol representing a monochromator with several gratings might implement both ``\texttt{has-position}`` and ``\texttt{has-turret}``, where the latter defines special messages for choosing which grating is used.
 Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
+
+We have carefully defined \yaq{} traits to maximize interoperability while not excluding hardware with unusual features.
+New traits can be discussed by the community through the yaq enhancement proposal system.
+We are somewhat conservative about adding new traits, and it's crucial that multiple hardware interface examples be considered when defining traits.
+Configuration that is unique to a single interface is best handled through protocol-specific messages.
+For example, our protocol for interfacing with data acquisition cards from Gage provides a message for setting the segment count.
+Unique messages are avaliable through script-based and graphical clients, but usage of such messages in scripts naturally limits portability.
 
 We now describe how the \yaq{} architecture addresses the three hardware interface barriers described at the beginning of this section.
 The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings
