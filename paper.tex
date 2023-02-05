@@ -209,10 +209,10 @@ In the middle, the same three hardware peripherals are represented in an interac
 The self-describing \yaq{} interface is used to provide graphical elements for the most commonly used messages.
 \texttt{yaqc-qtpy} is an invaluable tool which provides a ``free'' graphical user interface (GUI) to any daemon.
 
-At the bottom, we show several features associated with the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
+At the bottom, we graphically represent the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
-Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data.
-\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} provides a bridge to the Bluesky ecosystem.
+Bluesky has no built-in hardware interface support, instead relying on packages to create hardware-interfaces that are compatible with their Hardware Protocol defintions.
+\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} is a specialized client which adapts any \yaq{} protocol into Bluesky's Hardware Protocol.
 Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
 
 All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
