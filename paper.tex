@@ -175,6 +175,9 @@ Experimental orchestration often means doing several things at once, \textit{e.g
 To accomplish this task performantly, monolithic orchestration software often necessitates separate threads for each component hardware interface, a fragile pattern in which small mistakes become both critical and elusive errors.
 When writing orchestration software using \yaq{}, slow hardware interfaces are replaced by fast Avro-RPC.
 In our experience, the \yaq{} interface is responsive enough to give good performace when orchestrating tens of motors using a singly-threaded client.
+There is a limit where using TCP becomes a bottleneck for large resonses, such as those from cameras or other high throughput sensors.
+In our experience, this limit is approximately 1 megapixel.
+For larger sensors, a pure \yaq{} approach may not be appropriate.
 There is a longer discussion of timing and order-of-operations control details using \yaq{} in the Supplementary Material.
 
 \section{Experimental Flexibility}
