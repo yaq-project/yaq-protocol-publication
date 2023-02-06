@@ -4,7 +4,7 @@ bibtex paper.aux
 pdflatex --interaction=nonstopmode paper.tex
 pdflatex --interaction=nonstopmode paper.tex
 #
-pdflatex --interaction=nonstopmode SI.tex
+pdflatex --interaction=nonstopmode -shell-escape SI.tex
 bibtex SI.aux
-pdflatex --interaction=nonstopmode SI.tex
-pdflatex --interaction=nonstopmode SI.tex
+pdflatex --interaction=nonstopmode -shell-escape SI.tex
+pdflatex --interaction=nonstopmode -shell-escape SI.tex

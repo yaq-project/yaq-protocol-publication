@@ -4,6 +4,17 @@
 \usepackage{setspace}
 \usepackage{color}
 
+\RequirePackage{etoolbox}
+\RequirePackage{pmboxdraw}
+\RequirePackage[section]{minted}
+\usemintedstyle{default}
+\setminted[python]{linenos=false, frame=none}
+
+\definecolor{bg}{rgb}{0.95, 0.95, 0.95}
+
+\RequirePackage[many]{tcolorbox}
+\tcbuselibrary{minted}
+
 % text
 \usepackage[utf8]{inputenc}
 \setlength\parindent{0pt}
@@ -11,6 +22,8 @@
 \usepackage{enumitem}
 \renewcommand{\familydefault}{\sfdefault}
 \newcommand{\RomanNumeral}[1]{\textrm{\uppercase\expandafter{\romannumeral #1\relax}}}
+
+\newcommand\yaq{\texttt{yaq}}
 
 % math
 \usepackage{amssymb}
@@ -50,6 +63,30 @@
 \usepackage[colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=black, anchorcolor=black]
   {hyperref}
 \usepackage[all]{hypcap}  % helps hyperref work properly
+
+
+\NewTCBListing[number within=chapter, auto counter]{codefragment}{mo}{%
+  %colback=bg,
+  boxrule=1pt,
+  %colframe=bg,
+  arc=0pt,
+  shadow=false,
+  new/use counter=equation,
+  boxsep=1ex, top=0pt, left=0pt, right=0pt, bottom=0pt,
+  comment={\hfill(\arabic{chapter}.\arabic{equation})},
+  listing outside comment,
+  righthand width=3em,
+  sidebyside gap=0pt,
+  minted language=#1,
+  %before skip =-0.5\baselinestretch,
+  %after skip=2\baselinestretch,
+}
+
+\BeforeBeginEnvironment{codefragment}{\begin{singlespace}\stepcounter{equation}}
+\AfterEndEnvironment{codefragment}{\end{singlespace}}
+
+\newmintinline[bash]{bash}{bgcolor=bg}
+\newmintinline[python]{python}{bgcolor=bg}
 
 \begin{document}
 \pagenumbering{gobble}
@@ -151,6 +188,233 @@ To generate the data, run the \yaq{} daemon using \texttt{python scaling.py --co
 Then run \texttt{python scaling-data-gen.py}, which will communicate with the running daemon and produce a CSV written to standard out.
 The result can be saved to \texttt{scaling.csv}.
 To visualize the results, run \texttt{python plot-scaling.py}, which will read the CSV and produce the image.
+
+\clearpage
+
+\section{\texttt{yaqd-control}: tooling for managing \yaq{} daemons}
+
+\texttt{yaqd-control} is a command line utility provided by the \yaq{} project to manage \yaq{} daemons.
+The primary purpose of the tool is to maintain a list of active daemons, provide access to their configuration, and their running state.
+This includes querying the active state of known daemons, as well as starting daemons running as backgound services.
+
+\subsection{installation}
+
+yaqd-control can be installed via
+PyPI\cite{yaqd-control} or
+conda-forge\cite{yaqd-control-conda}.
+
+\begin{codefragment}{bash}
+$ pip install yaqd-control
+\end{codefragment}
+
+\begin{codefragment}{bash}
+$ conda config --add channels conda-forge
+$ conda install yaqd-control
+\end{codefragment}
+
+\subsection{Usage}
+
+yaqd-control is a command line application.
+
+Help: learn more, right from your terminal.
+
+\begin{codefragment}{bash}
+$ yaqd --help
+Usage: yaqd [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  clear-cache
+  disable
+  edit-config
+  enable
+  list
+  reload
+  restart
+  scan
+  start
+  status
+  stop
+\end{codefragment}
+
+Try \texttt{yaqd\ \ -\/-help} to learn more about a particular command.
+
+\paragraph{the cache}\label{the-cache}
+
+yaqd-control keeps track of known daemons, referred to as the cache
+
+Status: yaqd-control can quickly show you the status of all daemons in
+yaqd-control's cache. This is usually the most used subcommand, as it
+gives a quick overview of the system, which daemons are offline, and
+which are currently busy.
+
+\begin{codefragment}{bash}
+$ yaqd status
++-----------+-------+--------------------------+------+---------+-------+
+| host      | port  | kind                     | name | status  | busy  |
++-----------+-------+--------------------------+------+---------+-------+
+| 127.0.0.1 | 38202 | system-monitor           | foo  | online  | False |
+| 127.0.0.1 | 39054 | fake-continuous-hardware | bar  | online  | True  |
+| 127.0.0.1 | 39055 | fake-continuous-hardware | baz  | online  | False |
+| 127.0.0.1 | 39056 | fake-continuous-hardware | spam | offline | ?     |
+| 127.0.0.1 | 37067 | fake-discrete-hardware   | ham  | online  | False |
+| 127.0.0.1 | 37066 | fake-discrete-hardware   | eggs | online  | False |
++-----------+-------+--------------------------+------+---------+-------+
+\end{codefragment}
+
+List: this is essentially the same as \texttt{status} except that it
+does not attempt to contact the daemons, so it does not give you
+additional context. List supports a flag \texttt{--format} which accepts "json",
+"toml", "prettytable", or "happi".
+
+\begin{codefragment}{bash}
+$ yaqd list
++-----------+-------+--------------------------+------+
+| host      | port  | kind                     | name |
++-----------+-------+--------------------------+------+
+| 127.0.0.1 | 38202 | system-monitor           | foo  |
+| 127.0.0.1 | 39054 | fake-continuous-hardware | bar  |
+| 127.0.0.1 | 39055 | fake-continuous-hardware | baz  |
+| 127.0.0.1 | 39056 | fake-continuous-hardware | spam |
+| 127.0.0.1 | 37067 | fake-discrete-hardware   | ham  |
+| 127.0.0.1 | 37066 | fake-discrete-hardware   | eggs |
++-----------+-------+--------------------------+------+
+\end{codefragment}
+
+Scan: Scanning allows you to add currently running daemons to the cache.
+
+\begin{codefragment}{bash}
+$ yaqd scan
+scanning host 127.0.0.1 from 36000 to 39999...
+...saw unchanged daemon fake-discrete-hardware:eggs on port 37066
+...saw unchanged daemon fake-discrete-hardware:ham on port 37067
+...found new daemon system-monitor:foo on port 38202
+...found new daemon fake-continuous-hardware:bar on port 39054
+...saw unchanged daemon fake-continuous-hardware:baz on port 39055
+...known daemon fake-continuous-hardware:spam on port 39056 not responding
+...done!
+\end{codefragment}
+
+Scan has some additional options, passed as flags on the command line,
+which allow you to change the default scan range and host (for remotely
+accessed daemons):
+
+\begin{codefragment}{bash}
+$ yaqd scan --help
+Usage: yaqd scan [OPTIONS]
+
+Options:
+  --host TEXT      Host to scan.
+  --start INTEGER  Scan starting point.
+  --stop INTEGER   Scan stopping point.
+  --help           Show this message and exit.
+\end{codefragment}
+
+Edit Config: yaqd-control provides an easy way to edit the default
+config file location for a daemon kind. This uses your default editor
+(\texttt{EDITOR} environment variable), and defaults to \texttt{notepad.exe} on
+Windows, and \texttt{vi} on other platforms. Using yaqd-control to edit
+config files means that you do not need to know the default location.
+Additionally, it does some basic validity checks (that the toml parses
+and that each daemon section has the \texttt{port} keyword). If an error
+is found, you are prompted to re-edit the file. Daemons from the config
+file are added to the cache. You may pass multiple daemon kinds, which
+will be opened in succession.
+
+\begin{codefragment}{bash}
+$ yaqd edit-config fake-continuous-hardware system-monitor
+\end{codefragment}
+
+Clear Cache: Note that this is a destructive action.
+\texttt{clear-cache} deletes all daemons from the cache (thus
+\texttt{list} and \texttt{status} will give empty tables) There is no
+user feedback.
+
+\begin{codefragment}{bash}
+$ yaqd clear-cache
+$ yaqd status
++------+------+------+------+--------+------+
+| host | port | kind | name | status | busy |
++------+------+------+------+--------+------+
++------+------+------+------+--------+------+
+\end{codefragment}
+
+\paragraph{Running in the background}\label{running-in-the-background}
+Each of the commands in this section can take multiple daemon kinds.
+Enable: by enabling a daemon, you allow the operating system to manage
+that daemon in the background. An enabled daemon will always start again
+when you restart your computer. Enabling is required for the rest of the
+commands in this section to work as expected. After enabling, it's
+typical to start the daemon as well, this does not happen automatically.
+Enablement works in slightly different ways on different platforms, but
+the commands are the same (don't worry if the password prompts are
+different). Currently supported platforms are Linux (systemd), MacOS
+(launchd) and Windows (via NSSM, bundled with the distribution).
+
+\begin{codefragment}{bash}
+$ yaqd enable system-monitor
+[sudo] password for scipy2020:
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-unit-files ===
+Authentication is required to manage system service or unit files.
+Password:
+==== AUTHENTICATION COMPLETE ===
+\end{codefragment}
+
+Disable: this is the inverse operation to enable, which makes it so that
+the daemon does not start on reboot. This does not affect the running
+daemon.
+
+\begin{codefragment}{bash}
+$ yaqd disable system-monitor
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-unit-files ===
+Authentication is required to manage system service or unit files.
+Password:
+==== AUTHENTICATION COMPLETE ===
+Removed /etc/systemd/system/multi-user.target.wants/yaqd-system-monitor.service.
+\end{codefragment}
+
+Start: This starts the daemon running in the background immediately. It
+must have been enabled to run in the background using this command.
+
+\begin{codefragment}{bash}
+$ yaqd start system-monitor
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to start 'yaqd-system-monitor.service'.
+Password:
+==== AUTHENTICATION COMPLETE ===
+\end{codefragment}
+
+Stop: This stops the daemon running in the background immediately. It
+must have been running in the background using yaqd-control (either on
+startup via enable or via the start command above).
+
+\begin{codefragment}{bash}
+$ yaqd stop system-monitor
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to stop 'yaqd-system-monitor.service'.
+Password:
+==== AUTHENTICATION COMPLETE ===
+\end{codefragment}
+
+Restart/Reload: This stops (if running) and restarts the daemon running
+in the background immediately. Reload is slightly different in that it
+signals to the daemon to reload its configuration rather than completely
+restart, but effectively it is the same as restart (and is a pure alias
+where such a signal is not supported). It must have been enabled to run
+in the background using this command.
+
+\begin{codefragment}{bash}
+$ yaqd restart system-monitor
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to restart 'yaqd-system-monitor.service'.
+Password:
+==== AUTHENTICATION COMPLETE ===
+\end{codefragment}
+
+
+\clearpage
 
 \section{Package size analysis}
 
