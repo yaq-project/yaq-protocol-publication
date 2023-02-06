@@ -138,6 +138,8 @@ A sensor might implement a message called ``\texttt{get\_measured}'' which takes
 A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
 Messages make up the lowest level functionality of the \yaq{} interface.
 Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
+If multiple messages are sent simultaneously, the daemon processes one message at a time.
+The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
 When a client first connects to a daemon over TCP/IP, the daemon provides a complete description of its own protocol.
 We therefore refer to the daemons as ``self-describing''.
@@ -152,7 +154,7 @@ Importantly, specific protocols can also implement arbitrary additional messages
 
 We have carefully defined \yaq{} traits to maximize interoperability while not excluding hardware with unusual features.
 New traits can be discussed by the community through the yaq enhancement proposal system.
-We are somewhat conservative about adding new traits, and it's crucial that multiple hardware interface examples be considered when defining traits.
+It's crucial that multiple hardware interface examples be considered when defining traits.
 Configuration that is unique to a single interface is best handled through protocol-specific messages.
 For example, our protocol for interfacing with data acquisition cards from Gage provides a message for setting the segment count.
 Unique messages are avaliable through script-based and graphical clients, but usage of such messages in scripts naturally limits portability.
