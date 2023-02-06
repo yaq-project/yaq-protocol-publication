@@ -9,3 +9,6 @@ paperNotes.bib
 *.xml
 *blx.bib
 *.toc
+
+*.listing
+_minted*
