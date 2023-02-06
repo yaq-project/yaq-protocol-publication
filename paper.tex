@@ -329,6 +329,14 @@ Our website, https://yaq.fyi, automatically builds generated reference pages for
 These pages are automatically updated when new versions are published.
 Our website also contains written and video tutorials on \yaq{} usage and development.
 
+We have designed \yaq{} to be easier to deploy and maintain when compared to EPICS and TANGO.
+\yaq{} daemons are Python packages that can be installed on any platform using pip or conda.
+There is no need for centralized management servers or databases when using \yaq{}.
+The Avro RPC standard unambiguously describes the message signatures for any protocol, so users are always aware of the capabilities their hardware supports.
+Traits enable interchangability where possible.
+\yaq{} can easily be used alongside other experiment control software.
+We provide tooling (\texttt{yaqd-control}) which makes it easy to configure, list, and manage daemons as background services on Windows, MacOS, or Linux (See SI for more details).
+
 \yaq{} is open source software.
 Anyone can view, install, edit, and suggest changes to our growing collection of daemons and clients.
 Furthermore, anyone can create their own totally-custom client or daemon software separately by following the specified \yaq{} standard.
