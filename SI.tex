@@ -116,23 +116,75 @@
 \pagebreak
 \setcounter{page}{1}
 \pagenumbering{arabic}
-\renewcommand{\thepage}{S\arabic{page}} 
-\renewcommand{\thefigure}{S\arabic{figure}} 
+\renewcommand{\thepage}{S\arabic{page}}
+\renewcommand{\thefigure}{S\arabic{figure}}
 
 \pagebreak
 \renewcommand{\baselinestretch}{0.75}\normalsize
 \tableofcontents
 \renewcommand{\baselinestretch}{1.0}\normalsize
 
+\section{Orchestration Examples}
 
+Here we elaborate with detailed information about what orchestration looks like for \yaq{}.
+As we discussed in Section 3 of the manuscript, \yaq{} is designed to accommodate a wide variety of orchestration tools and approaches.
+
+\subsection{Raster Script}
+
+For those unfamiliar with \yaq{}, the best orchestration example is a simple self-contained script.
+
+\begin{codefragment}{Python}
+import time
+import yaqc
+motor1 = yaqc.Client(port=38000)
+motor2 = yaqc.Client(port=38001)
+sensor = yaqc.Client(port=38002)
+data = []
+for m1 in range(-10, 10, 1):
+    for m2 in range(0, 300, 5):
+        motor1.set_position(m1)
+        motor2.set_position(m2)
+        for c in [motor1, motor2]:
+            while c.busy():
+                time.sleep(0.001)
+        sensor.measure()
+        while sensor.busy():
+            time.sleep(0.001)
+        reading = dict()
+        reading["timestamp"] = time.time()
+        reading["motor1"] = motor1.get_position()
+        reading["motor2"] = motor2.get_position()
+        reading.update(sensor.get_measured())
+        data.append(reading)
+\end{codefragment}
+
+Here we are doing a two dimensional motor scan while collecting data from a sensor.
+Motor one is stepping from -10 to 10, and motor two is scanning from 0 to 300.
+Two examples of polling while not busy are used: the first to ensure that motors have stopped moving before sensors acquire, and the second to ensure that sensors stop collecting before the next motor motion happens.
+This ``tick tock'' moving multiple motors, collecting sensor data, and repeating is a common pattern.
+
+We believe that Python and the Scientific Python ecosystem is a powerfully simple tool for defining experimental procedures.
+Lightweight scripts such as these are encouraged by the \yaq{} project.
+
+\subsection{Landis}
+
+We discussed the Landis Group and their WiQK reactor in Section 3 of the manuscript.
+The Landis Group has defined several procedures for their flow reactor.
+These procedures are highly idiosyncratic and are based on the particular tubing lengths and the flow topology of the reactor.
+Each procedure involves articulating solenoid valves while injecting and withdrawing syringe pumps with a particular timing.
+The Landis Group has written Python functions that drive this hardware using \yaq{}.
+The functions parameterize the procedures in terms of chemically interesting variables like flow rate
+and reaction time.
+
+WiQK procedures and nascent graphical user interface can be found on GitHub at \\ \url{https://github.com/uw-madison-chem-shops/yaqc-wiqk}.
+
+\subsection{Wright \& Bluesky}
 
 \section{Timing and interface responsiveness}
 
-Each message call over the \yaq{} interface returns rapidly,
-ensuring that client applications are not blocked. Some mes-
-sages initiate long-running operations, e.g. motor motion and
-sensor measurement. Separate messages are provided to re-
-trieve results from e.g. sensor measurement.
+Each message call over the \yaq{} interface returns rapidly, ensuring that client applications are not blocked.
+Some messages initiate long-running operations, \emph{e.g.} motor motion and sensor measurement.
+Separate messages are provided to retrieve results from \emph{e.g.} sensor measurement.
 
 \subsection{\texttt{is\_busy} for orchestrating order of operations}
 
