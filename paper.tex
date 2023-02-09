@@ -137,12 +137,18 @@ Each message has defined input parameters and output return types.
 A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
 A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
 Messages make up the lowest level functionality of the \yaq{} interface.
-Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
-If multiple messages are sent simultaneously, the daemon processes one message at a time.
-The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
 Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
 When a client first connects to a daemon over TCP/IP, the daemon provides a complete description of its own protocol.
 We therefore refer to the daemons as ``self-describing''.
+
+Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
+If multiple messages are sent simultaneously, the daemon processes one message at a time.
+The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
+By being completely open to messages from multiple clients, \yaq{} makes it possible to accidentally supersede a message.
+This has not become a problem for our usage where instruments are controlled by single scientists who can clearly see all of the clients interacting with their system.
+Typically there is just one client sending `set\_position` and many clients polling `get\_position` to record data or display real-time information.
+Users may choose to implement access control systems, but we do not foresee building access control into the \yaq{} protocol.
+This is similar to how access control works in practice at some large facilities.
 
 \yaq{} introduces a concept called ``traits'' which are collections of related messages that are shared among multiple protocols.
 Motors implement the ``\texttt{has-position}'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
