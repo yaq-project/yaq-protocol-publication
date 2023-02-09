@@ -191,7 +191,12 @@ WiQK procedures and nascent graphical user interface can be found on GitHub at \
 
 \subsection{Wright \& Bluesky}
 
-In the main body of the window, a table represents the current state of the queue and history.
+The Wright Group uses a purpose-build graphical program to perform data acquisition.
+All of the hardware used is controlled via \yaq{}.
+Data is collected using Bluesky, which runs in a background process.
+
+The graphical program includes a queue of acquisition procedures (plans, in Bluesky terminology).
+In the main body of the queue window (Figure \ref{acq:fig:queue_tab}), a table represents the current state of the queue and history.
 More recently enqueued items appear towards the top of the table, older items towards the bottom.
 The items waiting in queue, thus, appear at the top, and the items in the history appear at the bottom.
 The currently running item (if it exists) appears at the boundary between the queue and the history.
@@ -202,11 +207,13 @@ On left, there are two columns with buttons: remove and load.
 Items in the queue (but not the history) can be removed individually with the red ``REMOVE'' buttons.
 All items can be loaded into the sidebar where the parameters can be modified and a similar (or identical) item enqueued.
 The other information provided include the plan name, the status (enqueued, RUNNING, completed, failed, aborted, stopped or unknown) and the description field, which lists the arguments passed to the plan.
-Hovering over the description shows the full JSON of the item (see Figure \ref{acq:fig:hover_text}, including an error message if applicable.
-The description has a contextual menu accessed via right clicking which provides additional options as shown in Figure \ref{acq:fig:right_click}.
-Most of the items in the context menu simply copy information to the clipboard: The full JSON as shown by the hover text, the item \Gls{UUID} which identifies the item in the queue, and the run \Gls{UUID} which identifies the data that is collected by the scan.
+Hovering over the description shows the full JSON of the item, including an error message if applicable.
 
-The plot tab (Figure \ref{acq:fig:plot_tab} presents a live representation of recent data collected for the current plan.
+Along the left side of the window, there is a panel that allows enqueuing new items.
+Figure \ref{acq:fig:grid_scan} shows the configuration panel for the most popular acquisition procedure, \texttt{grid\_scan}.
+This plan allows an arbitrary number of dimensions to be scanned against one another, selecting the hardware to be scanned and the detectors to read.
+
+The plot tab (Figure \ref{acq:fig:plot_tab}) presents a live representation of recent data collected for the current plan.
 The primary window is a PyQtGraph\cite{pyqtgraph} plot showing the most recent five slices of collected data.
 The current slice is the brightest cyan slice, with the previous slices shown as duller colors progressively until the last one which is gray.
 At the top, the currently plotted channel name and most recent collected value are shown in large font size.
@@ -215,7 +222,6 @@ At present, cameras and other higher dimensional sensors are not able to be plot
 On the right hand side, there are controls to adjust the plot.
 At the top, a selector allows for choosing which channel to plot.
 The second selector determines which values appear along the X-axis of the graph.
-In particular, to switch between a scalar channel and an array detected channel, both selectors will need to be adjusted, as the appropriate axes differ.
 Additionally, there is a selector which allows for changing the units of the X-axis.
 Finally, there is a Scan Index indicator, which indicates which indexed pixel was the most recent collected.
 
@@ -223,9 +229,9 @@ Finally, there is a Scan Index indicator, which indicates which indexed pixel wa
 
 \begin{landscape}
 \begin{figure}
-\includegraphics[width=9in]{"figures/yaqc-cmds.png"}
-\caption{The main queue window of \yaqccmds{}.}
-\label{acq:fig:yaqccmds}
+\includegraphics[width=9in]{"figures/queue_tab.png"}
+	\caption{The main queue window of \texttt{bluesky-cmds}.}
+\label{acq:fig:queue_tab}
 \end{figure}
 \end{landscape}
 
@@ -242,8 +248,8 @@ Finally, there is a Scan Index indicator, which indicates which indexed pixel wa
 \begin{landscape}
 \begin{figure}
 \includegraphics[width=9in]{"figures/plot_tab.png"}
-\caption{\blueskycmds with the Plot tab open.}
-\label{acq:fig:grid_scan}
+	\caption{\texttt{bluesky-cmds} with the Plot tab open.}
+\label{acq:fig:plot_tab}
 \end{figure}
 \end{landscape}
 
