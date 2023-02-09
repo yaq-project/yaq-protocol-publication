@@ -9,6 +9,7 @@
 \RequirePackage[section]{minted}
 \usemintedstyle{default}
 \setminted[python]{linenos=false, frame=none}
+\usepackage{lscape}
 
 \definecolor{bg}{rgb}{0.95, 0.95, 0.95}
 
@@ -24,6 +25,7 @@
 \newcommand{\RomanNumeral}[1]{\textrm{\uppercase\expandafter{\romannumeral #1\relax}}}
 
 \newcommand\yaq{\texttt{yaq}}
+\newcommand\yaqccmds{\texttt{yaqc-cmds}}
 
 % math
 \usepackage{amssymb}
@@ -179,6 +181,65 @@ and reaction time.
 WiQK procedures and nascent graphical user interface can be found on GitHub at \\ \url{https://github.com/uw-madison-chem-shops/yaqc-wiqk}.
 
 \subsection{Wright \& Bluesky}
+
+In the main body of the window, a table represents the current state of the queue and history.
+More recently enqueued items appear towards the top of the table, older items towards the bottom.
+The items waiting in queue, thus, appear at the top, and the items in the history appear at the bottom.
+The currently running item (if it exists) appears at the boundary between the queue and the history.
+The enqueued and running items have descriptions shown in bright white, while the completed items appear with gray descriptions.
+The right most column indicates the position in the queue, given as a zero-based index.
+Items can be reordered by editing the value in that column.
+On left, there are two columns with buttons: remove and load.
+Items in the queue (but not the history) can be removed individually with the red ``REMOVE'' buttons.
+All items can be loaded into the sidebar where the parameters can be modified and a similar (or identical) item enqueued.
+The other information provided include the plan name, the status (enqueued, RUNNING, completed, failed, aborted, stopped or unknown) and the description field, which lists the arguments passed to the plan.
+Hovering over the description shows the full JSON of the item (see Figure \ref{acq:fig:hover_text}, including an error message if applicable.
+The description has a contextual menu accessed via right clicking which provides additional options as shown in Figure \ref{acq:fig:right_click}.
+Most of the items in the context menu simply copy information to the clipboard: The full JSON as shown by the hover text, the item \Gls{UUID} which identifies the item in the queue, and the run \Gls{UUID} which identifies the data that is collected by the scan.
+
+The plot tab (Figure \ref{acq:fig:plot_tab} presents a live representation of recent data collected for the current plan.
+The primary window is a PyQtGraph\cite{pyqtgraph} plot showing the most recent five slices of collected data.
+The current slice is the brightest cyan slice, with the previous slices shown as duller colors progressively until the last one which is gray.
+At the top, the currently plotted channel name and most recent collected value are shown in large font size.
+The plotting does handle array detectors, for which the top number shown is the maximum value of the most recent array collected.
+At present, cameras and other higher dimensional sensors are not able to be plotted using the live plot tab.
+On the right hand side, there are controls to adjust the plot.
+At the top, a selector allows for choosing which channel to plot.
+The second selector determines which values appear along the X-axis of the graph.
+In particular, to switch between a scalar channel and an array detected channel, both selectors will need to be adjusted, as the appropriate axes differ.
+Additionally, there is a selector which allows for changing the units of the X-axis.
+Finally, there is a Scan Index indicator, which indicates which indexed pixel was the most recent collected.
+
+\clearpage
+
+\begin{landscape}
+\begin{figure}
+\includegraphics[width=9in]{"figures/yaqc-cmds.png"}
+\caption{The main queue window of \yaqccmds{}.}
+\label{acq:fig:yaqccmds}
+\end{figure}
+\end{landscape}
+
+\clearpage
+
+\begin{figure}
+\includegraphics[width=3in]{"figures/grid_scan.png"}
+\caption{The user interface for enqueueing a grid scan plan.}
+\label{acq:fig:grid_scan}
+\end{figure}
+
+\clearpage
+
+\begin{landscape}
+\begin{figure}
+\includegraphics[width=9in]{"figures/plot_tab.png"}
+\caption{\blueskycmds with the Plot tab open.}
+\label{acq:fig:grid_scan}
+\end{figure}
+\end{landscape}
+
+\clearpage
+
 
 \section{Timing and interface responsiveness}
 
