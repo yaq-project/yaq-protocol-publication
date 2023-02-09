@@ -68,20 +68,14 @@
 
 
 \NewTCBListing[number within=chapter, auto counter]{codefragment}{mo}{%
-  %colback=bg,
   boxrule=1pt,
-  %colframe=bg,
   arc=0pt,
   shadow=false,
-  new/use counter=equation,
   boxsep=1ex, top=0pt, left=0pt, right=0pt, bottom=0pt,
-  comment={\hfill(\arabic{chapter}.\arabic{equation})},
   listing outside comment,
-  righthand width=3em,
+  righthand width=0pt,
   sidebyside gap=0pt,
   minted language=#1,
-  %before skip =-0.5\baselinestretch,
-  %after skip=2\baselinestretch,
 }
 
 \BeforeBeginEnvironment{codefragment}{\begin{singlespace}\stepcounter{equation}}
@@ -130,6 +124,21 @@
 
 Here we elaborate with detailed information about what orchestration looks like for \yaq{}.
 As we discussed in Section 3 of the manuscript, \yaq{} is designed to accommodate a wide variety of orchestration tools and approaches.
+
+\subsection{\texttt{is\_busy} for orchestrating order of operations}
+
+Each message call over the \yaq{} interface returns rapidly, ensuring that client applications are not blocked.
+Some messages initiate long-running operations, \emph{e.g.} motor motion and sensor measurement.
+Separate messages are provided to retrieve results from \emph{e.g.} sensor measurement.
+
+In order to know how long to wait, all \yaq{} daemons provide a message called
+“is\_busy”, which returns "true" while the long running action
+is not complete, and "false" once it is finished. Additionally,
+multiple clients can communicate with the same daemon si-
+multaneously. A complex instrument may involve multiple
+operators watching sensor data in real time, while one pro-
+gram is orchestrating the hardware and recording the data.
+
 
 \subsection{Raster Script}
 
@@ -241,21 +250,29 @@ Finally, there is a Scan Index indicator, which indicates which indexed pixel wa
 \clearpage
 
 
-\section{Timing and interface responsiveness}
+\section{\yaq{} transport layer}
 
-Each message call over the \yaq{} interface returns rapidly, ensuring that client applications are not blocked.
-Some messages initiate long-running operations, \emph{e.g.} motor motion and sensor measurement.
-Separate messages are provided to retrieve results from \emph{e.g.} sensor measurement.
+\subsection{History of \yaq{} protocol format}
 
-\subsection{\texttt{is\_busy} for orchestrating order of operations}
+In the first days of \yaq{}, the message format was entirely made up of JSON strings, forming a generic Remote Procedure Call (RPC) framework.
+There was no pre-formed protocol, though there were standardized messages to query for all allowed message names, signatures, and documentation.
 
-In order to know how long to wait, all \yaq{} daemons provide a message called
-“is\_busy”, which returns "true" while the long running action
-is not complete, and "false" once it is finished. Additionally,
-multiple clients can communicate with the same daemon si-
-multaneously. A complex instrument may involve multiple
-operators watching sensor data in real time, while one pro-
-gram is orchestrating the hardware and recording the data.
+Only after having a largely functional implementation, we descovered a community standard, JSON-RPC \cite{jsonrpc}.
+While the exact format was not identical, almost all of the ideas we had built into our home baked JSON-based RPC were easy to translate into this standard format.
+Instead of relying on our own esoteric format, we converted all \yaq{} daemons and clients to use JSON-RPC.
+
+As \yaq{} gained hardware support and usage, it became evident that JSON was not an appropriate serialization format, especially when it comes to large binary data like images from cameras.
+As such, we transitioned to using an RPC based on JSON-RPC, but using Msgpack \cite{msgpack} for serialization.
+Msgpack is a format that can encode a strict superset of JSON messages, so swapping existing daemons required only changes to the core implementation and the client program (i.e. no changes to individual daemon implementations).
+Along with using Msgpack, we defined an extension type to represent NDArrays.
+
+The last major change to \yaq{}'s protocol format was the adoption of Apache Avro-RPC\cite{AvroSpecification}.
+Avro is similarly terse like Msgpack for serializing messages, while having a well defined specification for defining an RPC schema: a static definition of available messages, including their signatures and documentation.
+This statically defined schema pairs well with \yaq{}'s trait system.
+Daemon authors provide a short, minimal TOML file which describes the implemented traits and unique messages for a particular daemon.
+This then gets transformed by an automated tool to a full Avro-RPC JSON file describing the protocol.
+Avro is then used to encode individual messages with minimal overhead.
+
 
 \subsection{Scaling of large messages}
 
@@ -278,21 +295,26 @@ This test was conducted using 32-bit integer arrays.
 	\caption{\label{si:fig:scaling} Scaling of transport time as a function of number of pixels for 32-bit integer arrays. Both the x- and y-axes are logarithmically scaled. Common camera sizes (512, 512), (1024, 1024), and (1024, 4096) are highlighted to provide context for camera users.}
 \end{figure}
 
-Common camera sizes (512, 512), (1024, 1024), and (1024, 4096) are highlighted in \ref{si:fig:scaling} to provide context.
 
 There are some strategies that could be used to mitigate the performance problems of large cameras, but they have not been implemented because large arrays remain an edge case among current \yaq{} users.
 Such strategies could include enabling compression, using transport layers other than TCP, using regions-of-interest (ROIs) to limit array sizes, and writing arrays locally to disk and providing mechanisms for retrieval out of band.
+
 The Avro Specification \cite{AvroSpecification} specifically provides for compression codecs in the case of storing to disk, but there is nothing preventing the RPC pipe from similarly encoding the data, provided both ends of the communication support it.
-This would allow larger arrays to be transported using fewer bytes over TCP, which would likely improve performance for large arrays where TCP transport is the bottleneck.
+EPICS provides a similar NDArray data type, which has individual image level compression configureable \cite{normative_types}.
+Compression would allow larger arrays to be transported using fewer bytes over TCP, which would likely improve performance for large arrays where TCP transport is the bottleneck.
 While TCP is the only currently supported transport layer for \yaq{}, this limitation could be lifted in the future.
+
 TCP was chosen as the preferred starting point because it is ubiquitous, being available on every desired platform and implementation language.
 One alternative that would be relatively easy to support would be Unix domain sockets (UDS).
 UDS has an extremely similar interface to TCP sockets, and are handled in Python by the same standard library module.
 UDS is potentially more performant, but as the name suggests are limited to Unix-like systems (i.e. it will not work on Windows).
+
 ROIs are implemented on the handful of cameras currently in the \yaq{} ecosystem \cite{yaqd_andor,yaqd_pi}, however we are still in the experimentation phase and have not standardized ROI configuration into a \yaq{} trait.
 When only a subset of the total camera area is interesting, this is one way to limit array size over the interface.
+
 Finally \yaq{} daemons could be implemented to write arrays locally to disk, rather than transferring over the \yaq{} interface directly.
-This has not yet been implemented, and would require clients to have knowledge of how to retrieve and display the images collected, but there is nothing preventing this if throughput is a limitation.
+Anecdotally, many users of Bluesky, EPICS, and related technologies use a similar strategy for large image data.
+This has not yet been implemented for \ya{}, and would require clients to have knowledge of how to retrieve and display the images collected, but there is nothing preventing this if throughput is a limitation.
 If such behavior became a standard feature desired for cameras, it should be encapsulated in a \yaq{} trait to provide a consistent interface.
 
 To reproduce this figure, you will need the libraries specified in ``figures/requirements.txt''.
