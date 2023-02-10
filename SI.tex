@@ -125,21 +125,30 @@
 Here we elaborate with detailed information about what orchestration looks like for \yaq{}.
 As we discussed in Section 3 of the manuscript, \yaq{} is designed to accommodate a wide variety of orchestration tools and approaches.
 
-\subsection{\texttt{is\_busy} for orchestrating order of operations}
+\subsection{\texttt{is\_busy} for ensuring order of operations}
 
 Each message call over the \yaq{} interface returns rapidly, ensuring that client applications are not blocked.
 Some messages initiate long-running operations, \emph{e.g.} motor motion and sensor measurement.
 Separate messages are provided to retrieve results from \emph{e.g.} sensor measurement.
 
-In order to know how long to wait, all \yaq{} daemons provide a message called
-“is\_busy”, which returns "true" while the long running action
-is not complete, and "false" once it is finished. Additionally,
-multiple clients can communicate with the same daemon si-
-multaneously. A complex instrument may involve multiple
-operators watching sensor data in real time, while one pro-
-gram is orchestrating the hardware and recording the data.
+In order to know how long to wait, all \yaq{} daemons provide a message called “is\_busy”, which returns "true" while the long running action is not complete, and "false" once it is finished.
+Additionally, multiple clients can communicate with the same daemon simultaneously. A complex instrument may involve multiple operators watching sensor data in real time, while one program is orchestrating the hardware and recording the data.
 
+Script writers may simply wait for ``is\_busy'' to return ``false''.
 
+\begin{codefragment}{Python}
+import yaqc
+import time
+motor = yaqc.Client(port=38000)
+motor.set_position(500)  # initiate a long motor motion
+while motor.is_busy():
+    time.sleep(0.001)
+print("done")  # will only print when motion is complete
+\end{codefragment}
+
+This same pattern exists for sensors and more complex peripherals.
+
+\clearpage
 \subsection{Raster Script}
 
 For those unfamiliar with \yaq{}, the best orchestration example is a simple self-contained script.
@@ -191,7 +200,7 @@ WiQK procedures and nascent graphical user interface can be found on GitHub at \
 
 \subsection{Wright \& Bluesky}
 
-The Wright Group uses a purpose-build graphical program to perform data acquisition.
+The Wright Group uses a purpose-built graphical program to perform data acquisition.
 All of the hardware used is controlled via \yaq{}.
 Data is collected using Bluesky, which runs in a background process.
 
