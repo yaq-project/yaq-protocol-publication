@@ -1,7 +1,7 @@
 \documentclass[aip, amsmath, amssymb, reprint,]{revtex4-2}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL paper-as-submitted.tex   Sun Feb  5 20:06:44 2023
-%DIF ADD paper.tex                Sun Feb  5 19:36:06 2023
+%DIF ADD paper.tex                Fri Feb 10 07:42:15 2023
 
 \usepackage{graphicx}
 \usepackage{dcolumn}
@@ -222,14 +222,22 @@ Each message has defined input parameters and output return types.
 A sensor might implement a message called ``\texttt{get\_measured}'' which takes no parameters and returns a dictionary mapping channel names to numeric or array data.
 A motor would implement a pair of messages for setting and reading back the motor position: ``\texttt{set\_position(float position)} $\rightarrow$ \texttt{null}'' and ``\texttt{get\_position()} $\rightarrow$ \texttt{float}''.
 Messages make up the lowest level functionality of the \yaq{} interface.
-Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
-\DIFaddbegin \DIFadd{If multiple messages are sent simultaneously, the daemon processes one message at a time.
-The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
-}\DIFaddend Each daemon supports a collection of messages for its unique functionality, called the ``protocol''.
+Each \DIFdelbegin \DIFdel{individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
+Each }\DIFdelend daemon supports a collection of messages for its unique functionality, called the ``protocol''.
 When a client first connects to a daemon over TCP/IP, the daemon provides a complete description of its own protocol.
 We therefore refer to the daemons as ``self-describing''.
 
-\yaq{} introduces a concept called ``traits'' which are collections of related messages that are shared among multiple protocols.
+\DIFaddbegin \DIFadd{Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
+If multiple messages are sent simultaneously, the daemon processes one message at a time.
+The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
+By being completely open to messages from multiple clients, }\yaq{} \DIFadd{makes it possible to accidentally supersede a message.
+This has not become a problem for our usage where instruments are controlled by single scientists who can clearly see all of the clients interacting with their system.
+Typically there is just one client sending `set\_position` and many clients polling `get\_position` to record data or display real-time information.
+Users may choose to implement access control systems, but we do not foresee building access control into the }\yaq{} \DIFadd{protocol.
+This is similar to how access control works in practice at some large facilities.
+}
+
+\DIFaddend \yaq{} introduces a concept called ``traits'' which are collections of related messages that are shared among multiple protocols.
 Motors implement the ``\texttt{has-position}'' trait, which defines ``\texttt{set\_position}'', ``\texttt{get\_position}'', and ``\texttt{get\_units}''.
 Sensors would implement the ``\texttt{is-sensor}'' trait which defines ``\texttt{get\_measured}'', ``\texttt{get\_channel\_names}'', and ``\texttt{get\_channel\_units}''.
 Protocols which implement a trait must support all of the messages from the trait.
@@ -241,7 +249,7 @@ For example, a protocol representing a monochromator with several gratings might
 New traits can be discussed by the community through the yaq enhancement proposal system.
 It's crucial that multiple hardware interface examples be considered when defining traits.
 Configuration that is unique to a single interface is best handled through protocol-specific messages.
-For example, our protocol for interfacing with data acquisition cards from Gage provides a message for setting the segment count.
+For example, our protocol for interfacing with a specific data acquisition card provides a message for setting the segment count.
 Unique messages are avaliable through script-based and graphical clients, but usage of such messages in scripts naturally limits portability.
 }
 
@@ -321,7 +329,11 @@ At the bottom, we \DIFdelbegin \DIFdel{show several features associated with }\D
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
 \DIFdelbegin \DIFdel{Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data}\DIFdelend \DIFaddbegin \DIFadd{Bluesky has no built-in hardware interface support, instead relying on packages to create hardware-interfaces that are compatible with their Hardware Protocol defintions}\DIFaddend .
 \texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} \DIFdelbegin \DIFdel{provides a bridge to the Blueskyecosystem}\DIFdelend \DIFaddbegin \DIFadd{is a specialized client which adapts any }\yaq{} \DIFadd{protocol into Bluesky's Hardware Protocol}\DIFaddend .
-Similar translation layers could be built for a variety of orchestration layers such as PyMoDAQ\cite{WeberSebastien2021a}, Instrumental\cite{Bogdanowicz2022}, or TRSpectrometer\cite{trspectrometer}.
+Similar translation layers could be built for a variety of orchestration \DIFdelbegin \DIFdel{layers }\DIFdelend \DIFaddbegin \DIFadd{software }\DIFaddend such as PyMoDAQ\cite{WeberSebastien2021a}, \DIFdelbegin \DIFdel{Instrumental\mbox{%DIFAUXCMD
+\cite{Bogdanowicz2022}}\hskip0pt%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{PyMeasure\mbox{%DIFAUXCMD
+\cite{pymeasure}}\hskip0pt%DIFAUXCMD
+}\DIFaddend , or TRSpectrometer\cite{trspectrometer}.
 
 All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
 All types of clients can be used simultaneously to interact with the same instrument in different modes.
@@ -355,7 +367,8 @@ First, because daemons are separate and portable programs, the development effor
 Often, researchers can download an existing daemon rather than writing a new one.
 Second, \yaq{} daemon development can be performed separately from the particulars of any individual client.
 Often, this separation allows initial hardware enablement work to be done on a researchers personal machine before the new hardware peripheral is installed in the instrument.
-Third, when developing trait-compliant protocols, it becomes easy to design and fully test your hardware interface.
+\DIFaddbegin \DIFadd{Separability, portability, and distributed development are advantages common to many open-source hardware interface projects.
+}\DIFaddend Third, when developing trait-compliant protocols, it becomes easy to design and fully test your hardware interface.
 Traits are unambiguous and well-described, making an obvious target for development.
 Tooling exists to verify full trait compliance, for example you can use \texttt{yaqc-qtpy} to provide a graphical program to interact with your hardware immediately.
 Finally, as discussed in Section II, \yaq{} provides options to design using remote hardware or unusual interfaces when necessary.
@@ -425,18 +438,18 @@ Software \DIFdelbegin \DIFdel{documentation is famously difficult and thankless 
 }\DIFaddend \yaq{} attempts to automate daemon documentation as much as possible.
 Our website, https://yaq.fyi, automatically builds generated reference pages for all known protocols.
 These pages are automatically updated when new versions are published.
-Our website also contains written and video tutorials on \yaq{} usage and development\DIFaddbegin \DIFadd{.
-}
+Our website also contains written and video tutorials on \yaq{} usage and development.
 
-\DIFadd{We have designed }\yaq{} \DIFadd{to be easier to deploy and maintain when compared to EPICS and TANGO.
+\DIFaddbegin \DIFadd{We have designed }\yaq{} \DIFadd{to be easier to deploy and maintain when compared to EPICS and TANGO.
 }\yaq{} \DIFadd{daemons are Python packages that can be installed on any platform using pip or conda.
 There is no need for centralized management servers or databases when using }\yaq{}\DIFadd{.
 The Avro RPC standard unambiguously describes the message signatures for any protocol, so users are always aware of the capabilities their hardware supports.
 Traits enable interchangability where possible.
 }\yaq{} \DIFadd{can easily be used alongside other experiment control software.
-We provide tooling (}\texttt{\DIFadd{yaqd-control}}\DIFadd{) which makes it easy to configure, list, and manage daemons as background services on Windows, MacOS, or Linux (See SI for more details)}\DIFaddend .
+We provide tooling (}\texttt{\DIFadd{yaqd-control}}\DIFadd{) which makes it easy to configure, list, and manage daemons as background services on Windows, MacOS, or Linux (See SI for more details).
+}
 
-\yaq{} is open source software.
+\DIFaddend \yaq{} is open source software.
 Anyone can view, install, edit, and suggest changes to our growing collection of daemons and clients.
 Furthermore, anyone can create their own totally-custom client or daemon software separately by following the specified \yaq{} standard.
 Thirteen individuals have contributed code to the development of \yaq{}.
@@ -454,11 +467,15 @@ Designing around self-describing protocols is a productive approach that has gre
 \section*{Supplementary Material}
 
 Full set of line-count data and script used to produce Figure \ref{fig:histogram}.
+\DIFaddbegin \DIFadd{More detailed examples of orchestration using }\yaq{}\DIFadd{, including scripts and graphical user interfaces.
+Detailed description of }\texttt{\DIFadd{yaqd-control}}\DIFadd{.
+Discussion and quantitative analysis of the }\yaq{} \DIFadd{interface's performance with large arrays.
+}\DIFaddend 
 
 \begin{acknowledgments}
 
 The authors would like to thank all \yaq{} users and contributors.
-We would also like to acknowledge the developers of the broader open source software community upon-which this project rests.
+We would also like to acknowledge the developers of the broader \DIFdelbegin \DIFdel{open source }\DIFdelend \DIFaddbegin \DIFadd{open-source }\DIFaddend software community upon-which this project rests.
 
 This work was supported by the National Science Foundation under grant CHE-1709060.
 
@@ -469,7 +486,9 @@ This work was supported by the National Science Foundation under grant CHE-17090
 The data that supports the findings of this study are available within the supplementary material.
 
 \section*{References}
+\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
 \nocite{*}
-\bibliography{references}
+}\hskip0pt%DIFAUXCMD
+}\DIFdelend \bibliography{references}
 
 \end{document}

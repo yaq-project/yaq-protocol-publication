@@ -31,9 +31,11 @@
 \author{Kent A. Meyer}
 \author{Peter L. Cruz Parrilla}
 \author{John C. Wright}
-\author{Blaise J. Thompson}
+\author{Blaise J. Thompson*}
 \affiliation{
-  University of Wisconsin--Madison
+  University of Wisconsin--Madison;
+  Madison, Wisconsin, 53706;
+  USA
 }
 \email{blaise.thompson@wisc.edu}
 
@@ -232,7 +234,7 @@ The self-describing \yaq{} interface is used to provide graphical elements for t
 At the bottom, we graphically represent the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
 Bluesky has no built-in hardware interface support, instead relying on packages to create hardware-interfaces that are compatible with their Hardware Protocol defintions.
-\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} is a specialized client which adapts any \yaq{} protocol into Bluesky's Hardware Protocol.
+\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} is a specialized client which adapts any \yaq{} protocol into Bluesky.
 Similar translation layers could be built for a variety of orchestration software such as PyMoDAQ\cite{WeberSebastien2021a}, PyMeasure\cite{pymeasure}, or TRSpectrometer\cite{trspectrometer}.
 
 All three types of clients represented in Figure \ref{fig:foundation} have been shown addressing the same three hardware peripherals.
@@ -364,11 +366,14 @@ Designing around self-describing protocols is a productive approach that has gre
 \section*{Supplementary Material}
 
 Full set of line-count data and script used to produce Figure \ref{fig:histogram}.
+More detailed examples of orchestration using \yaq{}, including scripts and graphical user interfaces.
+Detailed description of \texttt{yaqd-control}.
+Discussion and quantitative analysis of the \yaq{} interface's performance with large arrays.
 
 \begin{acknowledgments}
 
 The authors would like to thank all \yaq{} users and contributors.
-We would also like to acknowledge the developers of the broader open source software community upon-which this project rests.
+We would also like to acknowledge the developers of the broader open-source software community upon-which this project rests.
 
 This work was supported by the National Science Foundation under grant CHE-1709060.
 
