@@ -1,7 +1,7 @@
 \documentclass[aip, amsmath, amssymb, reprint,]{revtex4-2}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL paper-as-submitted.tex   Sun Feb  5 20:06:44 2023
-%DIF ADD paper.tex                Fri Feb 10 07:42:15 2023
+%DIF ADD paper.tex                Thu Mar 16 10:56:22 2023
 
 \usepackage{graphicx}
 \usepackage{dcolumn}
@@ -117,10 +117,16 @@
 \author{Peter L. Cruz Parrilla}
 \author{John C. Wright}
 \author{Blaise J. Thompson}
-\affiliation{
-  University of Wisconsin--Madison
+\DIFdelbegin %DIFDELCMD < \affiliation{
+%DIFDELCMD <   University of Wisconsin--Madison
+%DIFDELCMD < }
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \affiliation{
+  University of Wisconsin--Madison;
+  Madison, Wisconsin, 53706;
+  USA
 }
-\email{blaise.thompson@wisc.edu}
+\DIFaddend \email{blaise.thompson@wisc.edu}
 
 \date{\today}
 
@@ -162,13 +168,14 @@ In our experience EPICS and TANGO do not scale well to single-investigator lab e
 As smaller research labs have grown in experimental complexity, many individual labs have created domain-specific orchestration software.
 In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity\cite{WeberSebastien2021a,Bogdanowicz2022,trspectrometer,Koerner_2019,Campagnola_2014,pymeasure,Giesbrecht_2022,pylablib}.
 While this growth is encouraging, many of these are limited by their focus on particular types of hardware or particular experimental domains.
-Most small custom research instrumentation continues to rely on monolithic software which has hard-coded interface support for each particular connected device.
+\DIFaddbegin \DIFadd{More work needs to be done to catalog, compare, and contrast the large number of open-source projects that now exist.
+}\DIFaddend Most small custom research instrumentation continues to rely on monolithic software which has hard-coded interface support for each particular connected device.
 These monolithic applications tend to be inflexible and difficult to develop.
 
-We have created a new network-based communication standard for scientific instrumentation, \yaq{}.
+We have created a new network-based communication standard for scientific instrumentation, \yaq{} \DIFaddbegin \DIFadd{(Yet Another acQuisition)\footnote{see Supplementary Material for a full description of the name \yaq{}}}\DIFaddend .
 This standard borrows the most important ideas from established projects used by large user facilities while retaining the simplicity appropriate for small research labs.
 We have built this standard to be self-describing, portable, and reusable wherever possible.
-\DIFdelbegin \DIFdel{Our primary goal has been to make an interfacewhich simplifies orchestration softwaredevelopment as much as possible}\DIFdelend \DIFaddbegin \DIFadd{Via the }\yaq{} \DIFadd{interface, we provide easy-to-use hardware support for scientists to use with their choice of experiment orchestration software}\DIFaddend .
+\DIFdelbegin \DIFdel{Our primary goal has been to make an interfacewhich simplifies orchestration softwaredevelopment as much as possible}\DIFdelend \DIFaddbegin \DIFadd{Via the \yaq{} interface, we provide easy-to-use hardware support for scientists to use with their choice of experiment orchestration software}\DIFaddend .
 
 Here, we discuss the design of the \yaq{} standard in the context of challenges facing instrument designers.
 First, we discuss how particularly challenging hardware interfaces can become seemingly insurmountable barriers to software control.
@@ -230,7 +237,7 @@ We therefore refer to the daemons as ``self-describing''.
 \DIFaddbegin \DIFadd{Each individual communication between client and daemon involves one message being requested by the client and the response returned from the daemon.
 If multiple messages are sent simultaneously, the daemon processes one message at a time.
 The protocol is preemptive: in the case of a conflict, the daemon will obey the last message to arrive.
-By being completely open to messages from multiple clients, }\yaq{} \DIFadd{makes it possible to accidentally supersede a message.
+By being completely open to messages from multiple clients, \yaq{} makes it possible to accidentally supersede a message.
 This has not become a problem for our usage where instruments are controlled by single scientists who can clearly see all of the clients interacting with their system.
 Typically there is just one client sending `set\_position` and many clients polling `get\_position` to record data or display real-time information.
 Users may choose to implement access control systems, but we do not foresee building access control into the }\yaq{} \DIFadd{protocol.
@@ -245,7 +252,7 @@ Protocols which implement a trait must support all of the messages from the trai
 For example, a protocol representing a monochromator with several gratings might implement both ``}\texttt{\DIFadd{has-position}}\DIFadd{`` and ``}\texttt{\DIFadd{has-turret}}\DIFadd{``, where the latter defines special messages for choosing which grating is used.
 }\DIFaddend Importantly, specific protocols can also implement arbitrary additional messages that are not defined by any trait.
 
-\DIFaddbegin \DIFadd{We have carefully defined }\yaq{} \DIFadd{traits to maximize interoperability while not excluding hardware with unusual features.
+\DIFaddbegin \DIFadd{We have carefully defined \yaq{} traits to maximize interoperability while not excluding hardware with unusual features.
 New traits can be discussed by the community through the yaq enhancement proposal system.
 It's crucial that multiple hardware interface examples be considered when defining traits.
 Configuration that is unique to a single interface is best handled through protocol-specific messages.
@@ -253,7 +260,7 @@ For example, our protocol for interfacing with a specific data acquisition card 
 Unique messages are avaliable through script-based and graphical clients, but usage of such messages in scripts naturally limits portability.
 }
 
-\DIFadd{We now describe how the }\yaq{} \DIFadd{architecture addresses the three hardware interface barriers described at the beginning of this section.
+\DIFadd{We now describe how the \yaq{} architecture addresses the three hardware interface barriers described at the beginning of this section.
 }\DIFaddend The first hardware interface barrier: Multiple incompatible interfaces are used to communicate with each component of the system. % consider making this sentence (and the next paragraph starts) subsection headings
 \yaq{} provides a unified TCP/IP interface to all hardware peripherals based on the well-described Avro RPC protocol.
 The trait system was introduced in pursuit of our primary goal of easing the client development process.
@@ -281,8 +288,8 @@ In order to know how long to wait, the ``is-daemon`` trait provides a message ca
 Additionally, multiple clients can communicate with the same daemon simultaneously.
 A complex instrument may involve multiple operators watching sensor data in real time, while one program is orchestrating the hardware and recording the data}\DIFdelend \DIFaddbegin \DIFadd{those from cameras or other high throughput sensors.
 In our experience, this limit is approximately 1 megapixel.
-For larger sensors, a pure }\yaq{} \DIFadd{approach may not be appropriate.
-There is a longer discussion of timing and order-of-operations control details using }\yaq{} \DIFadd{in the Supplementary Material}\DIFaddend .
+For larger sensors, a pure \yaq{} approach may not be appropriate.
+There is a longer discussion of timing and order-of-operations control details using \yaq{} in the Supplementary Material}\DIFaddend .
 
 \section{Experimental Flexibility}
 
@@ -328,7 +335,7 @@ The self-describing \yaq{} interface is used to provide graphical elements for t
 At the bottom, we \DIFdelbegin \DIFdel{show several features associated with }\DIFdelend \DIFaddbegin \DIFadd{graphically represent }\DIFaddend the integration between \yaq{} and the Bluesky project\cite{AllanDanielB2019a}.
 Bluesky provides a powerful orchestration layer for conducting and recording data for a wide variety of experimental procedures.
 \DIFdelbegin \DIFdel{Shown in Figure \ref{fig:foundation}, we see one such GUI for parameterizing a Bluesky procedure and a representation of the resultant data}\DIFdelend \DIFaddbegin \DIFadd{Bluesky has no built-in hardware interface support, instead relying on packages to create hardware-interfaces that are compatible with their Hardware Protocol defintions}\DIFaddend .
-\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} \DIFdelbegin \DIFdel{provides a bridge to the Blueskyecosystem}\DIFdelend \DIFaddbegin \DIFadd{is a specialized client which adapts any }\yaq{} \DIFadd{protocol into Bluesky's Hardware Protocol}\DIFaddend .
+\texttt{yaqc-bluesky}\footnote{\texttt{yaqc-bluesky} available on PyPI at https://pypi.org/project/yaqc-bluesky/} \DIFdelbegin \DIFdel{provides a bridge to the Blueskyecosystem}\DIFdelend \DIFaddbegin \DIFadd{is a specialized client which adapts any }\yaq{} \DIFadd{protocol into Bluesky}\DIFaddend .
 Similar translation layers could be built for a variety of orchestration \DIFdelbegin \DIFdel{layers }\DIFdelend \DIFaddbegin \DIFadd{software }\DIFaddend such as PyMoDAQ\cite{WeberSebastien2021a}, \DIFdelbegin \DIFdel{Instrumental\mbox{%DIFAUXCMD
 \cite{Bogdanowicz2022}}\hskip0pt%DIFAUXCMD
 }\DIFdelend \DIFaddbegin \DIFadd{PyMeasure\mbox{%DIFAUXCMD
@@ -440,12 +447,12 @@ Our website, https://yaq.fyi, automatically builds generated reference pages for
 These pages are automatically updated when new versions are published.
 Our website also contains written and video tutorials on \yaq{} usage and development.
 
-\DIFaddbegin \DIFadd{We have designed }\yaq{} \DIFadd{to be easier to deploy and maintain when compared to EPICS and TANGO.
-}\yaq{} \DIFadd{daemons are Python packages that can be installed on any platform using pip or conda.
-There is no need for centralized management servers or databases when using }\yaq{}\DIFadd{.
+\DIFaddbegin \DIFadd{We have designed \yaq{} to be easier to deploy and maintain when compared to EPICS and TANGO.
+\yaq{} daemons are Python packages that can be installed on any platform using pip or conda.
+There is no need for centralized management servers or databases when using \yaq{}.
 The Avro RPC standard unambiguously describes the message signatures for any protocol, so users are always aware of the capabilities their hardware supports.
 Traits enable interchangability where possible.
-}\yaq{} \DIFadd{can easily be used alongside other experiment control software.
+\yaq{} can easily be used alongside other experiment control software.
 We provide tooling (}\texttt{\DIFadd{yaqd-control}}\DIFadd{) which makes it easy to configure, list, and manage daemons as background services on Windows, MacOS, or Linux (See SI for more details).
 }
 
@@ -467,10 +474,10 @@ Designing around self-describing protocols is a productive approach that has gre
 \section*{Supplementary Material}
 
 Full set of line-count data and script used to produce Figure \ref{fig:histogram}.
-\DIFaddbegin \DIFadd{More detailed examples of orchestration using }\yaq{}\DIFadd{, including scripts and graphical user interfaces.
+\DIFaddbegin \DIFadd{More detailed examples of orchestration using \yaq{}, including scripts and graphical user interfaces.
 Detailed description of }\texttt{\DIFadd{yaqd-control}}\DIFadd{.
-Discussion and quantitative analysis of the }\yaq{} \DIFadd{interface's performance with large arrays.
-}\DIFaddend 
+Discussion and quantitative analysis of the \yaq{} interface's performance with large arrays.
+}\DIFaddend
 
 \begin{acknowledgments}
 
@@ -486,9 +493,6 @@ This work was supported by the National Science Foundation under grant CHE-17090
 The data that supports the findings of this study are available within the supplementary material.
 
 \section*{References}
-\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
-\nocite{*}
-}\hskip0pt%DIFAUXCMD
-}\DIFdelend \bibliography{references}
+\bibliography{references}
 
 \end{document}
