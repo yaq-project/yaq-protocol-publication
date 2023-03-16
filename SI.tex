@@ -362,7 +362,7 @@ There are some strategies that could be used to mitigate the performance problem
 Such strategies could include enabling compression, using transport layers other than TCP, using regions-of-interest (ROIs) to limit array sizes, and writing arrays locally to disk and providing mechanisms for retrieval out of band.
 
 The Avro Specification \cite{AvroSpecification} specifically provides for compression codecs in the case of storing to disk, but there is nothing preventing the RPC pipe from similarly encoding the data, provided both ends of the communication support it.
-EPICS provides a similar NDArray data type, which has individual image level compression configureable \cite{normative_types}.
+EPICS provides a similar NDArray data type, which has individual image level compression configurable \cite{normative_types}.
 Compression would allow larger arrays to be transported using fewer bytes over TCP, which would likely improve performance for large arrays where TCP transport is the bottleneck.
 While TCP is the only currently supported transport layer for \yaq{}, this limitation could be lifted in the future.
 
