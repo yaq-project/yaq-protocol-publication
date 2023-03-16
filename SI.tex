@@ -200,12 +200,13 @@ data = []
 temp.set_position(100)
 # take data until temp greater than 90 deg
 while temp.get_position() <= 90:
-    sensor.measure()
-    while sensor.busy():
-        time.sleep(0.001)
     reading = dict()
     reading["timestamp"] = time.time()
     reading["temperature"] = temp.get_position()
+    # measure
+    sensor.measure()
+    while sensor.busy():
+        time.sleep(0.001)
     reading.update(sensor.get_measured())
     data.append(reading)
     # wait for next second
