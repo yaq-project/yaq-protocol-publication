@@ -79,10 +79,11 @@ In our experience EPICS and TANGO do not scale well to single-investigator lab e
 As smaller research labs have grown in experimental complexity, many individual labs have created domain-specific orchestration software.
 In the last few years, several open source projects by-and-for small-scale experimentalists have grown in popularity\cite{WeberSebastien2021a,Bogdanowicz2022,trspectrometer,Koerner_2019,Campagnola_2014,pymeasure,Giesbrecht_2022,pylablib}.
 While this growth is encouraging, many of these are limited by their focus on particular types of hardware or particular experimental domains.
+More work needs to be done to catalog, compare, and contrast the large number of open-source projects that now exist.
 Most small custom research instrumentation continues to rely on monolithic software which has hard-coded interface support for each particular connected device.
 These monolithic applications tend to be inflexible and difficult to develop.
 
-We have created a new network-based communication standard for scientific instrumentation, \yaq{}.
+We have created a new network-based communication standard for scientific instrumentation, \yaq{} (Yet Another acQuisition)\footnote{see Supplementary Material for a full description of the name ``\yaq{}''}.
 This standard borrows the most important ideas from established projects used by large user facilities while retaining the simplicity appropriate for small research labs.
 We have built this standard to be self-describing, portable, and reusable wherever possible.
 Via the \yaq{} interface, we provide easy-to-use hardware support for scientists to use with their choice of experiment orchestration software.

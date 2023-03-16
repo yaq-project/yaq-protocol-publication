@@ -134,14 +134,14 @@ Separate messages are provided to retrieve results from \emph{e.g.} sensor measu
 In order to know how long to wait, all \yaq{} daemons provide a message called “is\_busy”, which returns "true" while the long running action is not complete, and "false" once it is finished.
 Additionally, multiple clients can communicate with the same daemon simultaneously. A complex instrument may involve multiple operators watching sensor data in real time, while one program is orchestrating the hardware and recording the data.
 
-Script writers may simply wait for ``is\_busy'' to return ``false''.
+Script writers may simply wait for ``busy'' to return ``false''.
 
 \begin{codefragment}{Python}
 import yaqc
 import time
 motor = yaqc.Client(port=38000)
 motor.set_position(500)  # initiate a long motor motion
-while motor.is_busy():
+while motor.busy():
     time.sleep(0.001)
 print("done")  # will only print when motion is complete
 \end{codefragment}
@@ -161,8 +161,8 @@ motor2 = yaqc.Client(port=38001)
 sensor = yaqc.Client(port=38002)
 data = []
 for m1 in range(-10, 10, 1):
+    motor1.set_position(m1)
     for m2 in range(0, 300, 5):
-        motor1.set_position(m1)
         motor2.set_position(m2)
         for c in [motor1, motor2]:
             while c.busy():
@@ -185,6 +185,32 @@ This ``tick tock'' moving multiple motors, collecting sensor data, and repeating
 
 We believe that Python and the Scientific Python ecosystem is a powerfully simple tool for defining experimental procedures.
 Lightweight scripts such as these are encouraged by the \yaq{} project.
+
+\clearpage
+
+\subsection{Non-Blocking Script}
+
+\begin{codefragment}{Python}
+import time
+import yaqc
+temp = yaqc.Client(port=38003)
+sensor = yaqc.Client(port=38004)
+data = []
+# begin heating
+temp.set_position(100)
+# take data until temp greater than 90 deg
+while temp.get_position <= 90:
+    sensor.measure()
+    while sensor.busy():
+        time.sleep(0.001)
+    reading = dict()
+    reading["timestamp"] = time.time()
+    reading["temperature"] = temp.get_position()
+    reading.update(sensor.get_measured())
+    data.append(reading)
+\end{codefragment}
+
+\clearpage
 
 \subsection{Landis}
 
@@ -223,7 +249,7 @@ Figure \ref{acq:fig:grid_scan} shows the configuration panel for the most popula
 This plan allows an arbitrary number of dimensions to be scanned against one another, selecting the hardware to be scanned and the detectors to read.
 
 The plot tab (Figure \ref{acq:fig:plot_tab}) presents a live representation of recent data collected for the current plan.
-The primary window is a PyQtGraph\cite{pyqtgraph} plot showing the most recent five slices of collected data.
+The primary window is a PyQtGraph \cite{pyqtgraph} plot showing the most recent five slices of collected data.
 The current slice is the brightest cyan slice, with the previous slices shown as duller colors progressively until the last one which is gray.
 At the top, the currently plotted channel name and most recent collected value are shown in large font size.
 The plotting does handle array detectors, for which the top number shown is the maximum value of the most recent array collected.
@@ -281,7 +307,7 @@ As such, we transitioned to using an RPC based on JSON-RPC, but using Msgpack \c
 Msgpack is a format that can encode a strict superset of JSON messages, so swapping existing daemons required only changes to the core implementation and the client program (i.e. no changes to individual daemon implementations).
 Along with using Msgpack, we defined an extension type to represent NDArrays.
 
-The last major change to \yaq{}'s protocol format was the adoption of Apache Avro-RPC\cite{AvroSpecification}.
+The last major change to \yaq{}'s protocol format was the adoption of Apache Avro-RPC \cite{AvroSpecification}.
 Avro is similarly terse like Msgpack for serializing messages, while having a well defined specification for defining an RPC schema: a static definition of available messages, including their signatures and documentation.
 This statically defined schema pairs well with \yaq{}'s trait system.
 Daemon authors provide a short, minimal TOML file which describes the implemented traits and unique messages for a particular daemon.
@@ -350,8 +376,8 @@ This includes querying the active state of known daemons, as well as starting da
 \subsection{installation}
 
 yaqd-control can be installed via
-PyPI\cite{yaqd-control} or
-conda-forge\cite{yaqd-control-conda}.
+PyPI \cite{yaqd-control} or
+conda-forge \cite{yaqd-control-conda}.
 
 \begin{codefragment}{bash}
 $ pip install yaqd-control
@@ -568,7 +594,7 @@ Password:
 
 \section{Package size analysis}
 
-The raw data for package size analysis was collected using Tokei\cite{tokei}, a command line tool for analysing line lengths of source code.
+The raw data for package size analysis was collected using Tokei \cite{tokei}, a command line tool for analysing line lengths of source code.
 It includes breaking down line length into ``code'', ``comments'', and ``blank'' lines.
 The package size data was curated into \texttt{figures/lines\_histogram.txt}, which includes annotations as to the ``type'' and ``class'' for each file.
 The ``type'' annotation is one of ``stub'' (meaning that the bulk of the implementation is in another file), ``normal'' (an individual daemon with the bulk of its implementation), ``protocol'' (an implementation the provides for multiple daemons, such as those referred to by ``stub''s, or ``serial'' (the implementation of a serial protocol rather than a full fledged daemon).
@@ -577,6 +603,17 @@ The ``class'' refers to the primary function of the daemon and is one of the fol
 The plotting script \texttt{figures/lines\_histogram.py} can be used to generate the figure from this text file.
 The figure uses the ``code'' lines to generate a histogram of file sizes in the \yaq{} python implementations.
 This is a measurable proxy for the amount of work that implementing an individual \yaq{} daemon entails, though of course cannot capture the work involved in learning the lower level interface.
+
+\section{The name \yaq{}}
+
+The name \yaq{} started out as an ``inside joke'' with several meanings. \\
+For posterity, we describe those meanings here.
+\begin{enumerate}
+  \item \yaq{} is similar to the popular acronym ``daq'' (Data AcQuisition)
+  \item \yaq{} could stand for Yet Another acQuisition, a reference to the popular tongue-in-cheek naming convention ``yet another X'' in software development \cite{Raymond_1996}. This is a particularly poignant reference for the authors, who are well aware that \yaq{} is ``yet another project'' in a long line of increasingly sophisticated hardware interface software packages in the Wright Group.
+  \item \yaq{} can reference the animal ``yak'', \textit{Bos grunniens}, who serves as a mascot for the project.
+  \item \yaq{} is an obscure reference to the term ``yak shaving'', coined by Carlin Vieri at MIT in the 1990s \cite{CarlinVieri}. Quoting from Wiktionary \cite{yak_shaving}: yak shaving is \textit{any apparently useless activity which, by allowing you to overcome intermediate difficulties, allows you to solve a larger problem}. The entire \yaq{} project is one giant ``yak shaving'' task that ultimately enables progress towards our primary mission---creative, reproducible, insightful experimental science.
+\end{enumerate}
 
 \clearpage
 
