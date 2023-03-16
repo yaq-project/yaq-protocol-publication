@@ -1,0 +1,7 @@
+protocol = "scaling"
+traits = ["is-daemon"]
+
+[messages]
+[messages.rand_int32]
+request = [{name="dim1", type="int"}, {name="dim2", type="int"}]
+response = "ndarray"

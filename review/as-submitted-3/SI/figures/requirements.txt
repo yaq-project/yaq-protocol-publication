@@ -1,0 +1,5 @@
+numpy==1.24.2
+matplotlib==3.6.3
+pandas==1.5.3
+yaqd-core==2023.2.0
+yaqc==2022.5.0
