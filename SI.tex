@@ -148,6 +148,11 @@ print("done")  # will only print when motion is complete
 
 This same pattern exists for sensors and more complex peripherals.
 
+
+We believe that Python and the Scientific Python ecosystem is a powerfully simple tool for defining experimental procedures.
+Lightweight scripts such as these are encouraged by the \yaq{} project.
+The following two sections contain example orchestration scripts for common tasks.
+
 \clearpage
 \subsection{Raster Script}
 
@@ -183,12 +188,12 @@ Motor one is stepping from -10 to 10, and motor two is scanning from 0 to 300.
 Two examples of polling while not busy are used: the first to ensure that motors have stopped moving before sensors acquire, and the second to ensure that sensors stop collecting before the next motor motion happens.
 This ``tick tock'' moving multiple motors, collecting sensor data, and repeating is a common pattern.
 
-We believe that Python and the Scientific Python ecosystem is a powerfully simple tool for defining experimental procedures.
-Lightweight scripts such as these are encouraged by the \yaq{} project.
-
 \clearpage
 
 \subsection{Non-Blocking Script}
+
+Sometimes you want to acquire data while a peripheral continuously moves, asynchronously with data acquisition.
+The following is an example where sample temperature is continuously ramped and data is collected every second.
 
 \begin{codefragment}{Python}
 import time
@@ -215,6 +220,16 @@ while temp.get_position() <= 90:
 # stop heating
 temp.set_position(25)
 \end{codefragment}
+
+Imagine that the temperature starts out at room temperature, 25.
+We first set the temp client to 100, beginning to heat the sample.
+The outer while loop will continue until the temperature reaches our desired end-point of 90.
+Each second, the while loop collects the current temperature and the current sensor reading.
+This type of experiment is common in the chemical sciences.
+
+Note that we pay no attention to the busy state of the temp client.
+When compared with the previous raster scanning example, we see that \yaq{} can be flexible about which hardware operations are kept synchronous and which are allowed to run ``freely'' without blocking other operations.
+The ubiquity and simplicity of the busy message allows for this flexibility.
 
 \clearpage
 
@@ -330,8 +345,8 @@ Cameras can have large arrays which contain the scientifically interesting data.
 While \yaq{} is flexible enough to represent such arrays, it was not specifically designed with large cameras as the primary usecase.
 As such, performance does suffer above about 1 Megapixel.
 Figure \ref{si:fig:scaling} shows the relationship between number of pixels and time for a \yaq{} message to read the array.
-Below about $2^{18}$ (~250,000) pixels, there is virtually no dependence on size, with the standard overhead of a \yaq{} message dominating the time for transfer.
-\yaq{} remains usable for up to approximately $2^{20}$ (~1,000,000) pixels.
+Below about $2^{18}$ ($\approx250,000$) pixels, there is virtually no dependence on size, with the standard overhead of a \yaq{} message dominating the time for transfer.
+\yaq{} remains usable for up to approximately $2^{20}$ ($\approx1,000,000$) pixels.
 ``Usable'' is a relative term which will depend greatly on context.
 Here we generally mean ``seems responsive to a user trying to have feedback on human timescales''.
 Applications which require high speed, high throughput cameras are unlikely to be suitable for \yaq{} even with relatively small cameras.
@@ -361,7 +376,7 @@ When only a subset of the total camera area is interesting, this is one way to l
 
 Finally \yaq{} daemons could be implemented to write arrays locally to disk, rather than transferring over the \yaq{} interface directly.
 Anecdotally, many users of Bluesky, EPICS, and related technologies use a similar strategy for large image data.
-This has not yet been implemented for \ya{}, and would require clients to have knowledge of how to retrieve and display the images collected, but there is nothing preventing this if throughput is a limitation.
+This has not yet been implemented for \yaq{}, and would require clients to have knowledge of how to retrieve and display the images collected, but there is nothing preventing this if throughput is a limitation.
 If such behavior became a standard feature desired for cameras, it should be encapsulated in a \yaq{} trait to provide a consistent interface.
 
 To reproduce this figure, you will need the libraries specified in ``figures/requirements.txt''.
