@@ -125,7 +125,7 @@
 Here we elaborate with detailed information about what orchestration looks like for \yaq{}.
 As we discussed in Section 3 of the manuscript, \yaq{} is designed to accommodate a wide variety of orchestration tools and approaches.
 
-\subsection{\texttt{is\_busy} for ensuring order of operations}
+\subsection{\texttt{busy} for ensuring order of operations}
 
 Each message call over the \yaq{} interface returns rapidly, ensuring that client applications are not blocked.
 Some messages initiate long-running operations, \emph{e.g.} motor motion and sensor measurement.
@@ -249,7 +249,7 @@ WiQK procedures and nascent graphical user interface can be found on GitHub at \
 
 The Wright Group uses a purpose-built graphical program to perform data acquisition.
 All of the hardware used is controlled via \yaq{}.
-Data is collected using Bluesky, which runs in a background process.
+Data is collected using Bluesky \cite{AllanDanielB2019a}, which runs in a background process.
 
 The graphical program includes a queue of acquisition procedures (plans, in Bluesky terminology).
 In the main body of the queue window (Figure \ref{acq:fig:queue_tab}), a table represents the current state of the queue and history.
