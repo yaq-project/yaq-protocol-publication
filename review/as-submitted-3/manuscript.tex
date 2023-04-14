@@ -113,7 +113,7 @@ Custom orchestration software needs to be closed before the manufacturers config
 A graduate student finds themself needing to master advanced concepts in concurrency in order to orchestrate many motors performantly.
 
 \begin{figure}
-    \includegraphics[width=\columnwidth]{figures/network}
+    \includegraphics[width=\columnwidth]{figure1.png}
     \caption{\label{fig:network} Simplified network diagram for a hypothetical instrument. Three computers are connected via orange Ethernet cables and a network switch (middle right). Some of the computers are also connected to hardware peripherals via one of six interfaces (colored lines). For each interface, the computer runs a \yaq{} daemon (small colored squares). The top and bottom computers are also running \yaq{} client applications.}
 \end{figure}
 
@@ -217,7 +217,7 @@ Beyond this, clients can use traits to interact with similar hardware identicall
 A client written to perform a two dimensional fluorescence experiment using two Acton monochromators will also work with Horiba monochromators without any modification.
 
 \begin{figure}
-  \includegraphics[width=\columnwidth]{figures/client_spectrum}
+  \includegraphics[width=\columnwidth]{figure2.png}
   \caption{\label{fig:foundation} Representations of three very different \yaq{} client experiences. Top: light-weight scripting. Middle: graphical user interface. Bottom: integration with Bluesky for data collection. In all three cases the same daemons are addressed.}
 \end{figure}
 
@@ -283,7 +283,7 @@ The format it generates is an important part of how \yaq{} protocols are self-de
 This shields developers from the details of Apache Avro, which can be somewhat esoteric.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figures/lines_histogram},
+\includegraphics[width=\columnwidth]{figure3.png},
 	\caption{  \label{fig:histogram} Histogram of the number of lines for each implemented daemon.
 	Some daemons are implemented in ways that share code, resulting in apparent line counts less than 10.
 	For example, the Thorlabs APT\cite{thorlabs_apt} motor implementation supports at least eight different daemons with each specifying only a handful of constants.
