@@ -1,0 +1,7 @@
+# The yaq project: Standardized software enabling flexible instrumentation 
+ 
+Kyle F. Sunden, Daniel D. Kohler, Kent A. Meyer, Peter L. Cruz Parrilla, John C. Wright, and Blaise J. Thompson
+
+[Review of Scientific Instruments](https://doi.org/10.1063/5.0135255)
+
+Modern instrumentation development often involves the incorporation of many dissimilar hardware peripherals into a single unified instrument. The increasing availability of modular hardware has brought greater instrument complexity to small research groups. This complexity stretches the capability of traditional, monolithic orchestration software. In many cases, a lack of software flexibility leads creative researchers to feel frustrated, unable to perform experiments they envision. Herein, we describe Yet Another acQuisition (yaq), a software project defining a new standardized way of communicating with diverse hardware peripherals. yaq encourages a highly modular approach to experimental software development that is well suited to address the experimental flexibility needs of complex instruments. yaq is designed to overcome hardware communication barriers that challenge typical experimental software. A large number of hardware peripherals are already supported, with tooling available to expand support. The yaq standard enables collaboration among multiple research groups, increasing code quality while lowering development effort.
